@@ -1,0 +1,13 @@
+solver:callback
+time_limit:3600
+slack_substation:
+slack_flow:
+use_cross_table:
+multi:
+
+1) solver=callback, time=3600.803823, seed=0, best_integer=19687803.084027, best_obj_val=19080707.669143, gap=3.083612
+2) solver=callback, time=3601.088847, seed=0, best_integer=21550352.099549, best_obj_val=21164504.247162, gap=1.790448
+3) solver=callback, time=3600.785274, seed=0, best_integer=22729518.811859, best_obj_val=22273911.249176, gap=2.004475
+4) solver=callback, time=3601.236763, seed=0, best_integer=24448485.492078, best_obj_val=24204275.109024, gap=0.998877
+5) solver=callback, time=3600.777891, seed=0, best_integer=24695100.384757, best_obj_val=23215261.354313, gap=5.992440
+6) solver=callback, time=3601.125198, seed=0, best_integer=24934641.849888, best_obj_val=24298343.823934, gap=2.551864

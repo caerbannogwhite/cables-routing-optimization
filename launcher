@@ -1,0 +1,284 @@
+#!/usr/bin/python3
+
+import os
+import random
+import sys
+import subprocess
+from time import strftime
+
+EPSILON_SMALL = 10e-9
+
+def launch(i, tb, report_fh, launcher_params, solver_params):
+	args = ['./bin/WindFarmOptimizationMain']
+	for param in list(solver_params.keys()):
+		if param == 'turbine_file': solver_params[param] = tb[1]
+		if param == 'cable_file':	solver_params[param] = tb[0]
+		if param == 'subs_cables':	solver_params[param] = tb[2]
+
+		args.append('-' + param)
+		args.append(str(solver_params[param]))
+
+	print("[%s] Launcher.batch: testbed %s" % (strftime('%H:%M'), tb[1].split('/')[1]))
+
+	os.system(' '.join(args) + ' > log')
+
+	res = get_results(i, report_fh, solver_params)
+	if res and ('plot' in launcher_params):
+		plot(solver_params, save=True)
+
+
+def read_input():
+	launcher_params = dict()
+	solver_params = dict()
+
+	handler = open('params', 'r')
+	
+	for line in handler:
+
+		# skip unused lines
+		if len(line) == 0 or line[0] == '#':
+			continue
+
+		spl = line.split()
+
+		if len(spl) == 2:
+			param, value = spl
+			if value.isdigit(): value = int(value)
+		elif len(spl) == 1:
+			param, value = spl[0], ''
+
+		if param.find('launcher') == 0:
+			param = param.replace('launcher_', '')
+			launcher_params[param] = value
+		else:
+			solver_params[param] = value
+
+	handler.close()
+
+	return launcher_params, solver_params
+
+
+def read_testbed():
+	testbed_fh = open('testbeds', 'r')
+	testbed = list()
+
+	for tb in testbed_fh:
+		spl = tb.split()
+		if len(spl) < 3:
+			break
+
+		cbl, turb, C = spl
+		C = int(C)
+		testbed.append([cbl, turb, C])
+
+	testbed_fh.close()
+	return testbed
+
+
+def plot(solver_params, save=False):
+
+	# check if a solution exists
+	if not os.path.exists('solution'):
+		print('Launcher.plot: No solution found. Exit.')
+		sys.exit()
+
+	turbines = list()
+	cables = list()
+	
+	turbine_file = open(solver_params['turbine_file'], 'r')
+	for line in turbine_file:
+		turbines.append([float(i) for i in line.split()])
+	turbine_file.close()
+	
+	cable_file = open(solver_params['cable_file'], 'r')
+	for line in cable_file:
+		cables.append([float(i) for i in line.split()])
+	cable_file.close()
+	
+	# contiamo le turbine per decidere la grandezza del font
+	fonts = 6
+	w = 4
+	if(len(turbines) < 40):
+	    fonts = 7
+	    w = 2
+	
+	x_vars = list()
+	f_vars = list()
+	
+	solution_file = open('solution', 'r')
+	for line in solution_file:
+		a, b, c, d, e = line.split()
+	
+		if a == 'f':
+			f_vars.append([int(b), int(c), float(e)])
+		if a == 'x':
+			x_vars.append([int(b), int(c), int(d), float(e)])
+	
+	solution_file.close()
+	
+	# NETWORKX
+	G = nx.DiGraph()
+	coords = dict()
+	sub = list()
+	for i, turb in enumerate(turbines):
+	    if turb[2] < -0.5:
+	    	sub.append(i)
+	    G.add_node(i)
+	    coords[i] = (turb[0], turb[1])
+	    
+	for x in x_vars:
+		weight = cables[x[2]][0] / w
+		label = int(cables[x[2]][0])
+		G.add_edge(x[0], x[1], weight=weight, label=label)
+
+	edge_color = list()
+	for f in f_vars:
+		if f[2] > (cables[-2][0] + EPSILON_SMALL):
+			edge_color.append('red')
+		else:
+			edge_color.append('black')
+	
+	     
+	node_color = ['green' if not node in sub else 'darkred' for node in G.nodes()]
+	#edge_color = ('black')
+	
+	# Draw nodes
+	#nx.draw_networkx(G, coords, node_size=20, width=[G[i][j]['weight'] for i,j in G.edges], node_color=node_color)
+	nx.draw(G, coords, node_size=20, width=[G[i][j]['weight'] for i,j in G.edges], node_color=node_color)
+
+	# Draw edges
+	#nx.draw_networkx_edges(G, coords, edge_color=edge_color)
+	
+	# Draw edge labels
+	nx.draw_networkx_edge_labels(G, coords, edge_labels=nx.get_edge_attributes(G,'label'), font_size = fonts)
+	plt.axis('off')
+	
+	if save:	# Save plot as image
+		file_name = solver_params['solver'] + '_' + solver_params['turbine_file'].split('_')[1].split('.')[0] + '_' + strftime('%y%m%d_%H%M')
+		plt.savefig('data/img/' + file_name + '.png', dpi=1000)
+		plt.clf()
+	else:		# Show plot
+		plt.show()	
+
+
+def plot_perf(time, score, final_score):
+	#print(time)
+	#print(score)
+	#plt.plot(time, score, 'b-', time, [final_score]*len(time), 'r--')
+	#plt.axis([0, 3605, None, None])
+	#plt.yscale('log')
+	#plt.xlabel('time (s)')
+	#plt.ylabel('solution value')
+	#file_name = 'perf_plot_' + solver_params['solver'] + '_' + solver_params['turbine_file'].split('_')[1].split('.')[0] + '_' + strftime('%y%m%d_%H%M')
+	#plt.savefig('data/img/' + file_name + '.png', dpi=1000)
+	#plt.clf()
+	pass
+
+
+def get_results(i, report_fh, solver_params):
+	fh = open('log', 'r')
+	solver = solver_params['solver']
+	time = solver_params['time_limit']
+	seed = solver_params['seed']
+	tb_num = int(solver_params['turbine_file'].split('_')[1].split('.')[0])
+	best_integer = 0.0
+	best_obj_val = 0.0
+	gap = 0.0
+
+	ans = True
+	if solver == "VNS" or solver == "simulated_annealing":
+		perf_time = list()
+		perf_score = list()
+		final_score = 0
+
+	for line in fh:
+
+		if solver == "VNS" or solver == "simulated_annealing":
+			if line.find("time_elapsed") != -1:
+				a, b, c = line.split('=')
+
+				if b.find("final_score") != -1:
+					final_score = float(c)
+				else:
+					perf_time.append(float(b.split()[0]))
+					perf_score.append(float(c))
+
+
+		if line.find("Best obj-val=") != -1:
+			best_obj_val = float(line.split('=')[1])
+		if line.find("Best integer=") != -1:
+			best_integer = float(line.split('=')[1])
+		#if line.find("Total (root+branch&cut)") != -1:
+		#	time = float(line.split('=')[1].split()[0])
+		if line.find("WFopt ended. Time elapsed") != -1:
+			time = float(line.split("=")[1].split()[0])
+
+	if best_integer == 0.0 or best_obj_val == 0.0:
+		report_fh.write("%d) solver=%s, time=%f, seed=%d, no solution exists\n" % (tb_num, solver, time, seed))
+		ans = False
+
+	else:
+		gap = (1 - best_obj_val / best_integer) * 100
+		report_fh.write("%d) solver=%s, time=%f, seed=%d, best_integer=%f, best_obj_val=%f, gap=%f\n" % (tb_num, solver, time, seed, best_integer, best_obj_val, gap))
+
+	fh.close()
+
+	if solver == "VNS" or solver == "simulated_annealing":
+		plot_perf(perf_time, perf_score, final_score)
+
+	return ans
+
+
+def batch(launcher_params, solver_params):
+	# compile
+	if 'compile' in launcher_params:
+		os.system('./compile')
+
+	if 'alltestbeds' in launcher_params:
+		testbeds = read_testbed()
+
+		file_name = strftime('%y%m%d_%H%M')
+		report_fh = open('data/collected/' + file_name + '.in', 'w')
+		for param in list(solver_params.keys()):
+			report_fh.write(param + ':' + str(solver_params[param]) + '\n')
+
+		report_fh.write('\n')
+
+		for i,tb in enumerate(testbeds):
+
+			# radndom seed
+			solver_params['seed'] = 0
+
+			if 'repeat' in launcher_params:
+				for j in range(launcher_params['repeat']):
+					solver_params['seed'] = random.randint(1, 100000)
+					launch(i, tb, report_fh, launcher_params, solver_params)
+			else:
+				launch(i, tb, report_fh, launcher_params, solver_params)
+
+		report_fh.close()
+
+	else:
+		args = ['./bin/WindFarmOptimizationMain']
+		for param in list(solver_params.keys()):
+			args.append('-' + param)
+			args.append(str(solver_params[param]))
+
+		os.system(' '.join(args))
+		if 'plot' in launcher_params:
+			plot(solver_params, save=False)
+
+
+if __name__ == '__main__':
+	launcher_params, solver_params = read_input()
+	
+	if 'plot' in launcher_params:
+		import matplotlib.pyplot as plt
+		import networkx as nx
+
+	batch(launcher_params, solver_params)
+
+	if 'clean' in launcher_params:
+		if os.path.exists('log'): os.remove('log')
+		if os.path.exists('model.lp'): os.remove('model.lp')
+		if os.path.exists('solution'): os.remove('solution')

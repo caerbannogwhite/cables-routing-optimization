@@ -1,0 +1,19 @@
+solver:VNS
+time_limit:30
+use_cross_table:
+
+7) solver=VNS, time=30.000209, seed=96634, best_integer=9426319.951847, best_obj_val=9426319.951847, gap=0.000000
+7) solver=VNS, time=30.000247, seed=91225, best_integer=8555829.595689, best_obj_val=8555829.595689, gap=0.000000
+7) solver=VNS, time=30.000595, seed=23954, best_integer=9295565.031173, best_obj_val=9295565.031173, gap=0.000000
+7) solver=VNS, time=30.000249, seed=68017, best_integer=8590584.980135, best_obj_val=8590584.980135, gap=0.000000
+7) solver=VNS, time=30.000409, seed=74611, best_integer=9012872.843853, best_obj_val=9012872.843853, gap=0.000000
+8) solver=VNS, time=30.000565, seed=97649, best_integer=8871828.896539, best_obj_val=8871828.896539, gap=0.000000
+8) solver=VNS, time=30.000471, seed=40784, best_integer=9253353.880492, best_obj_val=9253353.880492, gap=0.000000
+8) solver=VNS, time=30.000673, seed=15560, best_integer=9416848.555189, best_obj_val=9416848.555189, gap=0.000000
+8) solver=VNS, time=30.000600, seed=32152, best_integer=8867506.343774, best_obj_val=8867506.343774, gap=0.000000
+8) solver=VNS, time=30.000463, seed=88306, best_integer=9341501.532247, best_obj_val=9341501.532247, gap=0.000000
+9) solver=VNS, time=30.000246, seed=11320, best_integer=13068803.037280, best_obj_val=13068803.037280, gap=0.000000
+9) solver=VNS, time=30.000547, seed=6797, best_integer=12824461.989869, best_obj_val=12824461.989869, gap=0.000000
+9) solver=VNS, time=30.000385, seed=88698, best_integer=13319732.684293, best_obj_val=13319732.684293, gap=0.000000
+9) solver=VNS, time=30.000498, seed=35789, best_integer=13377432.170923, best_obj_val=13377432.170923, gap=0.000000
+9) solver=VNS, time=30.000401, seed=29932, best_integer=12933551.227651, best_obj_val=12933551.227651, gap=0.000000

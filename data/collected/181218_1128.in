@@ -1,0 +1,26 @@
+solver:callback
+time_limit:600
+slack_substation:
+slack_flow:
+multi:
+
+1) solver=callback, time=600.117126, seed=64668, best_integer=19756948.229936, best_obj_val=19066414.466518, gap=3.495144
+1) solver=callback, time=600.143008, seed=99862, best_integer=20496345.173087, best_obj_val=19068875.402113, gap=6.964509
+1) solver=callback, time=600.127738, seed=19209, best_integer=19678356.104589, best_obj_val=19068875.402113, gap=3.097214
+1) solver=callback, time=600.128410, seed=25021, best_integer=19700780.492990, best_obj_val=19072713.263353, gap=3.188032
+1) solver=callback, time=600.115222, seed=98613, best_integer=3000020717214.407227, best_obj_val=19066446.697547, gap=99.999364
+3) solver=callback, time=600.162914, seed=87060, best_integer=22958101.727255, best_obj_val=22352327.249624, gap=2.638609
+3) solver=callback, time=600.121083, seed=58616, best_integer=22839554.746726, best_obj_val=22335607.102276, gap=2.206469
+3) solver=callback, time=600.159837, seed=39044, best_integer=23609931.573612, best_obj_val=22351460.350279, gap=5.330262
+3) solver=callback, time=600.097707, seed=11681, best_integer=22697009.582579, best_obj_val=22347119.502539, gap=1.541569
+3) solver=callback, time=600.156668, seed=26163, best_integer=22956126.121577, best_obj_val=22351838.719547, gap=2.632358
+5) solver=callback, time=600.078101, seed=1609, best_integer=25199824.993729, best_obj_val=23174454.340042, gap=8.037241
+5) solver=callback, time=600.092583, seed=25506, best_integer=4000024109608.154785, best_obj_val=23147752.470643, gap=99.999421
+5) solver=callback, time=600.086683, seed=29898, best_integer=5000024592048.624023, best_obj_val=23174454.340042, gap=99.999537
+5) solver=callback, time=600.082710, seed=87850, best_integer=24934023.253533, best_obj_val=23147752.470643, gap=7.163989
+5) solver=callback, time=600.083929, seed=54151, best_integer=27066195.177181, best_obj_val=23174454.340042, gap=14.378603
+27) solver=callback, time=601.568756, seed=80890, best_integer=23991566.861411, best_obj_val=22498519.638328, gap=6.223217
+27) solver=callback, time=601.156636, seed=36752, best_integer=24595644.901316, best_obj_val=22498519.638328, gap=8.526409
+27) solver=callback, time=601.283763, seed=97449, best_integer=23688621.225096, best_obj_val=22498519.638328, gap=5.023938
+27) solver=callback, time=600.975339, seed=88633, best_integer=23623991.293948, best_obj_val=22498519.638328, gap=4.764105
+27) solver=callback, time=600.793123, seed=21776, best_integer=23598920.816892, best_obj_val=22498519.638382, gap=4.662930

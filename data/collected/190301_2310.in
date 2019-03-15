@@ -1,0 +1,31 @@
+turbine_file:data/data_07.turb
+cable_file:data/data_07.cbl
+subs_cables:10
+solver:simulated_annealing
+time_limit:3600
+use_cross_table:
+
+1) solver=simulated_annealing, time=3600.002282, seed=0, best_integer=1450050104285.299805, best_obj_val=1450050104285.299805, gap=0.000000
+2) solver=simulated_annealing, time=3600.002329, seed=0, best_integer=1380054311285.996094, best_obj_val=1380054311285.996094, gap=0.000000
+3) solver=simulated_annealing, time=3600.002052, seed=0, best_integer=1680068798980.076172, best_obj_val=1680068798980.076172, gap=0.000000
+4) solver=simulated_annealing, time=3600.002309, seed=0, best_integer=1480065199418.403076, best_obj_val=1480065199418.403076, gap=0.000000
+5) solver=simulated_annealing, time=3600.002091, seed=0, best_integer=1510057337613.236816, best_obj_val=1510057337613.236816, gap=0.000000
+6) solver=simulated_annealing, time=3600.003178, seed=0, best_integer=1440070528751.375977, best_obj_val=1440070528751.375977, gap=0.000000
+7) solver=simulated_annealing, time=3600.000363, seed=0, best_integer=8631754.944640, best_obj_val=8631754.944640, gap=0.000000
+8) solver=simulated_annealing, time=3600.000307, seed=0, best_integer=8819376.573314, best_obj_val=8819376.573314, gap=0.000000
+9) solver=simulated_annealing, time=3600.000339, seed=0, best_integer=12397309.484198, best_obj_val=12397309.484198, gap=0.000000
+10) solver=simulated_annealing, time=3600.000298, seed=0, best_integer=10383686.911879, best_obj_val=10383686.911879, gap=0.000000
+12) solver=simulated_annealing, time=3600.000226, seed=0, best_integer=9175067.210647, best_obj_val=9175067.210647, gap=0.000000
+13) solver=simulated_annealing, time=3600.000443, seed=0, best_integer=8982354.010946, best_obj_val=8982354.010946, gap=0.000000
+14) solver=simulated_annealing, time=3600.000191, seed=0, best_integer=10568140.242631, best_obj_val=10568140.242631, gap=0.000000
+15) solver=simulated_annealing, time=3600.000337, seed=0, best_integer=10454542.490511, best_obj_val=10454542.490511, gap=0.000000
+16) solver=simulated_annealing, time=3600.000384, seed=0, best_integer=8661763.070367, best_obj_val=8661763.070367, gap=0.000000
+17) solver=simulated_annealing, time=3600.000352, seed=0, best_integer=9166714.274380, best_obj_val=9166714.274380, gap=0.000000
+18) solver=simulated_annealing, time=3600.000436, seed=0, best_integer=8837289.156357, best_obj_val=8837289.156357, gap=0.000000
+19) solver=simulated_annealing, time=3600.000314, seed=0, best_integer=9586265.799190, best_obj_val=9586265.799190, gap=0.000000
+20) solver=simulated_annealing, time=3600.002487, seed=0, best_integer=1610102489847.669434, best_obj_val=1610102489847.669434, gap=0.000000
+21) solver=simulated_annealing, time=3600.002436, seed=0, best_integer=1610108560222.529785, best_obj_val=1610108560222.529785, gap=0.000000
+26) solver=simulated_annealing, time=3600.003936, seed=0, best_integer=4420074445071.583984, best_obj_val=4420074445071.583984, gap=0.000000
+27) solver=simulated_annealing, time=3600.005648, seed=0, best_integer=3930081994922.471191, best_obj_val=3930081994922.471191, gap=0.000000
+28) solver=simulated_annealing, time=3600.003107, seed=0, best_integer=4420085748249.992188, best_obj_val=4420085748249.992188, gap=0.000000
+29) solver=simulated_annealing, time=3600.004395, seed=0, best_integer=4260089378684.416992, best_obj_val=4260089378684.416992, gap=0.000000

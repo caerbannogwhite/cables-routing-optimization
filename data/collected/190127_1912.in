@@ -1,0 +1,21 @@
+turbine_file:data/data_03.turb
+cable_file:data/data_03.cbl
+subs_cables:10
+solver:callback
+time_limit:600
+
+9) solver=callback, time=600.015516, seed=60397, best_integer=11159487.978427, best_obj_val=10928741.495728, gap=2.067716
+9) solver=callback, time=600.011683, seed=4522, best_integer=11159487.978427, best_obj_val=10944121.569687, gap=1.929895
+9) solver=callback, time=600.014659, seed=14678, best_integer=11159487.978427, best_obj_val=10893821.005549, gap=2.380638
+9) solver=callback, time=600.012233, seed=20137, best_integer=11159487.978427, best_obj_val=10895438.811867, gap=2.366141
+9) solver=callback, time=600.014456, seed=43187, best_integer=11159487.978427, best_obj_val=10941299.610564, gap=1.955183
+12) solver=callback, time=600.011639, seed=24647, best_integer=9009167.548744, best_obj_val=8748787.559855, gap=2.890167
+12) solver=callback, time=600.013542, seed=48019, best_integer=9009167.548744, best_obj_val=8742732.954418, gap=2.957372
+12) solver=callback, time=600.011939, seed=54105, best_integer=9009167.548744, best_obj_val=8748585.392478, gap=2.892411
+12) solver=callback, time=600.013976, seed=88410, best_integer=9009167.548744, best_obj_val=8764449.736776, gap=2.716320
+12) solver=callback, time=600.012366, seed=94983, best_integer=9009167.548744, best_obj_val=8764004.442504, gap=2.721263
+14) solver=callback, time=600.012124, seed=67324, best_integer=10377051.626825, best_obj_val=10087588.263256, gap=2.789457
+14) solver=callback, time=600.013066, seed=5137, best_integer=10377051.626825, best_obj_val=10090643.320814, gap=2.760016
+14) solver=callback, time=600.012313, seed=85443, best_integer=10377051.626825, best_obj_val=10086270.744813, gap=2.802153
+14) solver=callback, time=600.011427, seed=3224, best_integer=10377051.626825, best_obj_val=10099039.513034, gap=2.679105
+14) solver=callback, time=600.012420, seed=76906, best_integer=10377051.626825, best_obj_val=10102024.487720, gap=2.650340

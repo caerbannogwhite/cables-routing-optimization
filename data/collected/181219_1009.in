@@ -1,0 +1,33 @@
+solver:simulated_annealing
+time_limit:600
+
+1) solver=simulated_annealing, time=600.003310, seed=6539, best_integer=70027087118.593582, best_obj_val=70027087118.593582, gap=0.000000
+1) solver=simulated_annealing, time=600.003575, seed=18930, best_integer=50028036897.735527, best_obj_val=50028036897.735527, gap=0.000000
+1) solver=simulated_annealing, time=600.002886, seed=9942, best_integer=60025409673.848251, best_obj_val=60025409673.848251, gap=0.000000
+1) solver=simulated_annealing, time=600.002938, seed=76226, best_integer=20026627730.292427, best_obj_val=20026627730.292427, gap=0.000000
+1) solver=simulated_annealing, time=600.003452, seed=85672, best_integer=40028539353.135040, best_obj_val=40028539353.135040, gap=0.000000
+3) solver=simulated_annealing, time=600.002962, seed=98478, best_integer=70033090210.551666, best_obj_val=70033090210.551666, gap=0.000000
+3) solver=simulated_annealing, time=600.003696, seed=66134, best_integer=90028512271.587372, best_obj_val=90028512271.587372, gap=0.000000
+3) solver=simulated_annealing, time=600.002995, seed=16431, best_integer=80032893824.885803, best_obj_val=80032893824.885803, gap=0.000000
+3) solver=simulated_annealing, time=600.002744, seed=91130, best_integer=130031016327.801819, best_obj_val=130031016327.801819, gap=0.000000
+3) solver=simulated_annealing, time=600.002829, seed=76330, best_integer=150036551203.590393, best_obj_val=150036551203.590393, gap=0.000000
+5) solver=simulated_annealing, time=600.003224, seed=79496, best_integer=240035582856.497711, best_obj_val=240035582856.497711, gap=0.000000
+5) solver=simulated_annealing, time=600.002821, seed=27494, best_integer=40031799109.768448, best_obj_val=40031799109.768448, gap=0.000000
+5) solver=simulated_annealing, time=600.003046, seed=50432, best_integer=130032834671.396271, best_obj_val=130032834671.396271, gap=0.000000
+5) solver=simulated_annealing, time=600.003164, seed=55809, best_integer=160036317655.436218, best_obj_val=160036317655.436218, gap=0.000000
+5) solver=simulated_annealing, time=600.002767, seed=46963, best_integer=90032119986.525330, best_obj_val=90032119986.525330, gap=0.000000
+7) solver=simulated_annealing, time=600.000419, seed=95591, best_integer=9348780.008201, best_obj_val=9348780.008201, gap=0.000000
+7) solver=simulated_annealing, time=600.000417, seed=25654, best_integer=8598908.602843, best_obj_val=8598908.602843, gap=0.000000
+7) solver=simulated_annealing, time=600.000452, seed=95397, best_integer=8958777.667053, best_obj_val=8958777.667053, gap=0.000000
+7) solver=simulated_annealing, time=600.000422, seed=46270, best_integer=8792296.452198, best_obj_val=8792296.452198, gap=0.000000
+7) solver=simulated_annealing, time=600.000450, seed=54609, best_integer=8953389.960629, best_obj_val=8953389.960629, gap=0.000000
+8) solver=simulated_annealing, time=600.000472, seed=69307, best_integer=9123116.554456, best_obj_val=9123116.554456, gap=0.000000
+8) solver=simulated_annealing, time=600.000472, seed=72275, best_integer=8859155.014680, best_obj_val=8859155.014680, gap=0.000000
+8) solver=simulated_annealing, time=600.000505, seed=7409, best_integer=9339451.549516, best_obj_val=9339451.549516, gap=0.000000
+8) solver=simulated_annealing, time=600.000522, seed=27409, best_integer=9259563.888284, best_obj_val=9259563.888284, gap=0.000000
+8) solver=simulated_annealing, time=600.000461, seed=69037, best_integer=8819918.289886, best_obj_val=8819918.289886, gap=0.000000
+27) solver=simulated_annealing, time=600.006474, seed=9009, best_integer=90037596647.849182, best_obj_val=90037596647.849182, gap=0.000000
+27) solver=simulated_annealing, time=600.006122, seed=24011, best_integer=150036559752.900024, best_obj_val=150036559752.900024, gap=0.000000
+27) solver=simulated_annealing, time=600.005850, seed=55852, best_integer=140034175037.964569, best_obj_val=140034175037.964569, gap=0.000000
+27) solver=simulated_annealing, time=600.005972, seed=72299, best_integer=310043296760.846619, best_obj_val=310043296760.846619, gap=0.000000
+27) solver=simulated_annealing, time=600.005968, seed=96760, best_integer=260035123995.676208, best_obj_val=260035123995.676208, gap=0.000000

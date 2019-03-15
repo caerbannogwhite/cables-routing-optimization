@@ -1,0 +1,22 @@
+turbine_file data/data_07.turb
+cable_file data/data_07.cbl
+subs_cables 10
+
+#solver: none, lazy, newrows, loop, callback, hardfix, VNS, simulated_annealing
+solver simulated_annealing
+time_limit 3600
+#iter_time 30
+#slack_substation
+#slack_flow
+#hard_fix_prob 0.30
+#rins 1
+use_cross_table
+#multi
+#print_model
+#debug
+
+launcher_clean
+#launcher_plot
+#launcher_repeat 2
+launcher_compile
+launcher_alltestbeds

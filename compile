@@ -1,0 +1,22 @@
+#!/bin/bash
+
+CC=gcc
+PROG_HOME=/home/macs/coding/optimization/progetto-ro2
+CPLEX_HOME=/opt/ibm/ILOG/CPLEX_Studio128/cplex
+LIBS="-L. -L$CPLEX_HOME/lib/x86-64_linux/static_pic -lcplex -lm -lpthread -ldl"
+INC="-I. -I$CPLEX_HOME/include/ilcplex"
+OPT="-O2"
+
+EXE_NAME=$PROG_HOME/bin/WindFarmOptimizationMain
+
+for c_file in $PROG_HOME/src/*.c; do
+        filename="$(basename "$c_file")"
+        $CC -c $PROG_HOME/src/$filename -o $PROG_HOME/bin/$filename.o $INC $OPT
+done
+
+OBJS=""
+for o_file in $PROG_HOME/*.o; do
+        OBJS="$OBJS $o_file"
+done
+
+$CC -o $EXE_NAME $PROG_HOME/bin/main.c.o $LIBS $OPT

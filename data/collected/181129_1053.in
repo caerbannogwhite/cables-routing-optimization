@@ -1,0 +1,10 @@
+solver:lazy
+time_limit:3600
+slack_substation:
+
+1) solver=lazy, time=3600.698042, seed=0, best_integer=70000106901768.125000, best_obj_val=19147703.525811, gap=99.999973
+2) solver=lazy, time=3601.324684, seed=0, best_integer=70000107398075.468750, best_obj_val=21275046.045035, gap=99.999970
+3) solver=lazy, time=3600.687147, seed=0, best_integer=70000127415350.656250, best_obj_val=22383145.901408, gap=99.999968
+4) solver=lazy, time=3603.650244, seed=0, no solution exists
+5) solver=lazy, time=3600.660144, seed=0, best_integer=70000127126426.960938, best_obj_val=23322172.348181, gap=99.999967
+6) solver=lazy, time=3600.860907, seed=0, best_integer=70000127463979.406250, best_obj_val=24432068.882523, gap=99.999965

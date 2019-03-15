@@ -1,0 +1,11 @@
+turbine_file:data/data_07.turb
+cable_file:data/data_07.cbl
+subs_cables:10
+solver:VNS
+time_limit:600
+use_cross_table:
+
+1) solver=VNS, time=600.003317, seed=0, best_integer=22763680.764911, best_obj_val=22763680.764911, gap=0.000000
+2) solver=VNS, time=600.005248, seed=0, best_integer=24213130.823493, best_obj_val=24213130.823493, gap=0.000000
+3) solver=VNS, time=600.005560, seed=0, best_integer=10028575911.048939, best_obj_val=10028575911.048939, gap=0.000000
+4) solver=VNS, time=600.000000, seed=0, no solution exists

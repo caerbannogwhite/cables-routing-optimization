@@ -1,0 +1,13 @@
+turbine_file:data/data_01.turb
+cable_file:data/data_01.cbl
+subs_cables:10
+solver:callback
+time_limit:3600
+slack_substation:
+
+1) solver=callback, time=3600.204629, seed=0, no solution exists
+2) solver=callback, time=3600.000000, seed=0, no solution exists
+3) solver=callback, time=3601.752203, seed=0, best_integer=22617263.793996, best_obj_val=22524375.442346, gap=0.410697
+4) solver=callback, time=3602.228875, seed=0, no solution exists
+5) solver=callback, time=3602.480783, seed=0, no solution exists
+6) solver=callback, time=3609.449887, seed=0, no solution exists
