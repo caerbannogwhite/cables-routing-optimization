@@ -1,21 +1,22 @@
 
 #include "wf.h"
 
-void free_instance(instance *inst);
-void parse_command_line(int argc, char** argv, instance *inst);
-void read_input(instance *inst);
+void main_free_instance(instance *inst);
+void main_parse_command_line(int argc, char** argv, instance *inst);
+void main_read_input(instance *inst);
 
 instance inst;
 
 int main(int argc, char **argv) {
-    if (argc < 2)
-    {
-        printf("%s Usage: %s -help for help\n", get_log(), argv[0]);
+
+    // No enought arguments provided
+    if (argc < 2) {
+        printf("Usage: %s -help for help\n", argv[0]);
         exit(1);
     }
 
-    parse_command_line(argc, argv, &inst);
-    read_input(&inst);
+    main_parse_command_line(argc, argv, &inst);
+    main_read_input(&inst);
 
     struct timespec tstart, tend;
     inst.time_start = &tstart;
@@ -27,11 +28,11 @@ int main(int argc, char **argv) {
 
     if (VERBOSE >= 1) printf("%s WFopt ended. Time elapsed = %lf seconds.\n", get_log(), ((double)inst.time_end->tv_sec + 1.0e-9*inst.time_end->tv_nsec) - ((double)inst.time_start->tv_sec + 1.0e-9*inst.time_start->tv_nsec));
 
-    free_instance(&inst);
+    main_free_instance(&inst);
     return 0;
 }
 
-void free_instance(instance *inst) {
+void main_free_instance(instance *inst) {
     free(inst->x_turb_coords);
     free(inst->y_turb_coords);
     free(inst->turb_powers);
@@ -39,7 +40,7 @@ void free_instance(instance *inst) {
     free(inst->cable_costs);
 }
 
-void parse_command_line(int argc, char** argv, instance *inst) {
+void main_parse_command_line(int argc, char** argv, instance *inst) {
     int help, i;
     help = 0;
 
@@ -118,7 +119,7 @@ void parse_command_line(int argc, char** argv, instance *inst) {
     if (help) exit(1);
 }
 
-void read_input(instance *inst) {
+void main_read_input(instance *inst) {
     char line[100];
     int index, line_counter;
     int x, y, p;

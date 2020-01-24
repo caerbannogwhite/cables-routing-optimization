@@ -11,20 +11,20 @@ $(P) : aux.o heur.o main.o wf.o
 	$(CC) $(CFLAGS) bin/aux.o bin/heur.o bin/main.o bin/wf.o -o $@ $(LDLIBS) $(INC)
 	mv $@ bin
 
-aux.o : src/aux.cpp src/aux.h src/wf.h
-	$(CC) $(CFLAGS) -c src/aux.cpp $(LDLIBS) $(INC)
+aux.o : src/$*.cpp src/aux.h src/wf.h
+	$(CC) $(CFLAGS) -c src/$*.cpp $(LDLIBS) $(INC)
 	mv $@ bin
 
-heur.o : src/heur.cpp src/heur.h src/aux.h
-	$(CC) $(CFLAGS) -c src/heur.cpp $(LDLIBS) $(INC)
+heur.o : src/$*.cpp src/heur.h src/aux.h
+	$(CC) $(CFLAGS) -c src/$*.cpp $(LDLIBS) $(INC)
 	mv $@ bin
 
-main.o : src/main.cpp src/wf.h
-	$(CC) $(CFLAGS) -c src/main.cpp $(LDLIBS) $(INC)
+main.o : src/$*.cpp src/wf.h
+	$(CC) $(CFLAGS) -c src/$*.cpp $(LDLIBS) $(INC)
 	mv $@ bin
 
-wf.o : src/wf.cpp src/wf.h
-	$(CC) $(CFLAGS) -c src/wf.cpp $(LDLIBS) $(INC)
+wf.o : src/$*.cpp src/wf.h
+	$(CC) $(CFLAGS) -c src/$*.cpp $(LDLIBS) $(INC)
 	mv $@ bin
 
 clean:

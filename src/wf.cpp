@@ -603,22 +603,7 @@ void print_error(const char *err) {
     exit(1);
 }
 
-char *get_log() {
-    // variables
-    char log_buffer[100];
-
-    time_t curtime;
-    struct tm *tmp;
-
-    curtime = time(NULL);
-    tmp = gmtime(&curtime);
-
-    snprintf(log_buffer, sizeof(log_buffer), "[%2d:%2d:%2d]", tmp->tm_hour, tmp->tm_min, tmp->tm_sec);
-    return log_buffer;
-}
-
-int is_time_limit_expired(instance *inst)
-{
+int is_time_limit_expired(instance *inst) {
     clock_gettime(CLOCK_MONOTONIC, inst->time_end);
 
     double tspan = ((double)inst->time_end->tv_sec + 1.0e-9 * inst->time_end->tv_nsec) - ((double)inst->time_start->tv_sec + 1.0e-9 * inst->time_start->tv_nsec);
@@ -632,15 +617,13 @@ int is_time_limit_expired(instance *inst)
     return 0;
 }
 
-double get_time_elapsed(instance *inst)
-{
+double get_time_elapsed(instance *inst) {
     clock_gettime(CLOCK_MONOTONIC, inst->time_end);
     double tspan = ((double)inst->time_end->tv_sec + 1.0e-9 * inst->time_end->tv_nsec) - ((double)inst->time_start->tv_sec + 1.0e-9 * inst->time_start->tv_nsec);
     return tspan;
 }
 
-int mip_solved_to_optimality(CPXENVptr env, CPXLPptr lp)
-{
+int mip_solved_to_optimality(CPXENVptr env, CPXLPptr lp) {
     int lpstat = CPXgetstat(env, lp);
     printf("%s CPLEX lpstat %d\n", get_log(), lpstat);
     int solved = (lpstat == CPXMIP_OPTIMAL) ||
