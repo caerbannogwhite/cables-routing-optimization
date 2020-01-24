@@ -8,8 +8,9 @@ Alternatively, we implement two heuristic solvers that can run independently fro
 
 The original article we utilised to set up this project can be found [here](https://orbit.dtu.dk/en/publications/optimizing-wind-farm-cable-routing-considering-power-losses-2).
 
-The software requires **CPLEX**. Once you have installed it, you can change the `CPLEX_HOME` variable in `Makefile`.
+The software requires **CPLEX**. Once you have installed it in your computer, you can change the `CPLEX_HOME` variable in `Makefile`.
 
 Here are some images of the connections computed by our solver.
-![hardfix_03](https://github.com/caerbannogwhite/WindFarmCablesRoutingOptimization/blob/master/report/img/hardfix_03_p03_res.png)
-![hardfix_27](https://github.com/caerbannogwhite/WindFarmCablesRoutingOptimization/blob/master/report/img/hardfix_27_p03_res.png)
+
+[hardfix_03](https://github.com/caerbannogwhite/WindFarmCablesRoutingOptimization/blob/master/report/img/hardfix_03_p03_res.png)
+[hardfix_27](https://github.com/caerbannogwhite/WindFarmCablesRoutingOptimization/blob/master/report/img/hardfix_27_p03_res.png)
