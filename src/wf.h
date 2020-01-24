@@ -22,11 +22,7 @@
 #define CALLBACK_MODEL_TYPE     3
 #define LOOP_TASK_MODEL_TYPE    2
 
-
 #define DBL_MAX 10e20 /* max value */
-
-// variables
-char log_buffer[100];
 
 // data structures
 typedef struct {
@@ -113,65 +109,21 @@ inline int imin(int i1, int i2) { return i1 < i2 ? i1 : i2; }
 inline double dmax(double d1, double d2) { return d1 > d2 ? d1 : d2; }
 inline double dmin(double d1, double d2) { return d1 < d2 ? d1 : d2; }
 
-int fpos(int i, int j, instance *inst) { return inst->fstart + i * inst->n_turbines + j; }
-int xpos(int i, int j, int k, instance *inst) { return inst->xstart + i * inst->n_turbines * inst->n_cables + j * inst->n_cables + k; }
-int ypos(int i, int j, instance *inst) { return inst->ystart + i * inst->n_turbines + j; }
+inline int fpos(int i, int j, instance *inst) { return inst->fstart + i * inst->n_turbines + j; }
+inline int xpos(int i, int j, int k, instance *inst) { return inst->xstart + i * inst->n_turbines * inst->n_cables + j * inst->n_cables + k; }
+inline int ypos(int i, int j, instance *inst) { return inst->ystart + i * inst->n_turbines + j; }
 
-void print_error(const char *err)
-{
-    time_t curtime;
-    struct tm *tmp;
+int WFopt(instance *inst);
+void build_model(instance *inst, CPXENVptr env, CPXLPptr lp);
+void build_model_cross_constraints(instance *inst, CPXENVptr env, CPXLPptr lp);
+void loop_solver(instance *inst, CPXENVptr env, CPXLPptr lp);
+void callback_solver(instance *inst, CPXENVptr env, CPXLPptr lp);
+void hardfix_solver(instance *inst, CPXENVptr env, CPXLPptr lp);
 
-    curtime = time(NULL);
-    tmp = gmtime(&curtime);
-
-    fprintf(stderr, "\n[ERR %2d:%2d:%2d] %s\n", tmp->tm_hour, tmp->tm_min, tmp->tm_sec, err);
-    fflush(NULL);
-    exit(1);
-}
-
-char* get_log()
-{
-    time_t curtime;
-    struct tm *tmp;
-
-    curtime = time(NULL);
-    tmp = gmtime(&curtime);
-
-    snprintf(log_buffer, sizeof(log_buffer), "[%2d:%2d:%2d]", tmp->tm_hour, tmp->tm_min, tmp->tm_sec);
-    return log_buffer;
-}
-
-int is_time_limit_expired(instance *inst)
-{
-    clock_gettime(CLOCK_MONOTONIC, inst->time_end);
-    
-    double tspan = ((double)inst->time_end->tv_sec + 1.0e-9*inst->time_end->tv_nsec) - ((double)inst->time_start->tv_sec + 1.0e-9*inst->time_start->tv_nsec);
-    if (tspan > inst->time_limit)
-    {
-        if ( VERBOSE >= 100 ) printf("%s Time limit of %lf expired.\n", get_log(), inst->time_limit);
-        inst->time_limit_expired = 1;
-        return 1;
-    }
-    return 0;
-}
-
-double get_time_elapsed(instance *inst)
-{
-    clock_gettime(CLOCK_MONOTONIC, inst->time_end);
-    double tspan = ((double)inst->time_end->tv_sec + 1.0e-9*inst->time_end->tv_nsec) - ((double)inst->time_start->tv_sec + 1.0e-9*inst->time_start->tv_nsec);
-    return tspan;
-}
-
-int mip_solved_to_optimality(CPXENVptr env, CPXLPptr lp)
-{
-    int lpstat = CPXgetstat (env, lp);
-    printf("%s CPLEX lpstat %d\n", get_log(), lpstat);
-    int solved = 	( lpstat == CPXMIP_OPTIMAL ) ||
-                    ( lpstat == CPXMIP_OPTIMAL_INFEAS ) ||
-                    //( lpstat ==  CPXMIP_OPTIMAL_RELAXED ) ||
-                    ( lpstat ==  CPXMIP_OPTIMAL_TOL );
-    return solved;
-}
+void print_error(const char *err);
+char *get_log();
+int is_time_limit_expired(instance *inst);
+double get_time_elapsed(instance *inst);
+int mip_solved_to_optimality(CPXENVptr env, CPXLPptr lp);
 
 #endif //WF_H_
