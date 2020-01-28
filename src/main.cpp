@@ -1,22 +1,22 @@
 
 #include "wf.h"
 
-void main_free_instance(instance *inst);
-void main_parse_command_line(int argc, char** argv, instance *inst);
-void main_read_input(instance *inst);
+int main_free_instance(instance *inst);
+int main_parse_command_line(int argc, char** argv, instance *inst);
+int main_read_input(instance *inst);
 
 instance inst;
 
-int main(int argc, char **argv) {
-
+int main(int argc, char *argv[])
+{
     // No enought arguments provided
     if (argc < 2) {
-        printf("Usage: %s -help for help\n", argv[0]);
+        printf("Usage: %s --help to display options\n", argv[0]);
         exit(1);
     }
 
-    main_parse_command_line(argc, argv, &inst);
-    main_read_input(&inst);
+    if (main_parse_command_line(argc, argv, &inst)) { exit(1); }
+    if (main_read_input(&inst)) { exit(1); }
 
     struct timespec tstart, tend;
     inst.time_start = &tstart;
@@ -26,100 +26,91 @@ int main(int argc, char **argv) {
     if (WFopt(&inst)) print_error("Error within WFopt().");
     clock_gettime(CLOCK_MONOTONIC, inst.time_end);
 
-    if (VERBOSE >= 1) printf("%s WFopt ended. Time elapsed = %lf seconds.\n", get_log(), ((double)inst.time_end->tv_sec + 1.0e-9*inst.time_end->tv_nsec) - ((double)inst.time_start->tv_sec + 1.0e-9*inst.time_start->tv_nsec));
+    if (VERBOSE >= 1) printf("WFopt ended. Time elapsed = %lf seconds.\n", ((double)inst.time_end->tv_sec + 1.0e-9*inst.time_end->tv_nsec) - ((double)inst.time_start->tv_sec + 1.0e-9*inst.time_start->tv_nsec));
 
     main_free_instance(&inst);
     return 0;
 }
 
-void main_free_instance(instance *inst) {
+int main_free_instance(instance *inst)
+{
     free(inst->x_turb_coords);
     free(inst->y_turb_coords);
     free(inst->turb_powers);
     free(inst->cable_powers);
     free(inst->cable_costs);
+
+    return 0;
 }
 
-void main_parse_command_line(int argc, char** argv, instance *inst) {
-    int help, i;
-    help = 0;
-
-    // default
-    strcpy(inst->turbine_input_file, "NULL");
-    strcpy(inst->cable_input_file, "NULL");
-    strcpy(inst->params_file, "NULL");
-    inst->subs_cables = 999999999;
-    inst->turb_tot_power = 0.0;
-
-    inst->slack_substation = 0;
-    inst->slack_flow = 0;
-    inst->print_model = 0;
-    inst->rins = 0;
-    inst->polishafter=1e+75; 					// default value for polishafter
-    strcpy(inst->solver, "NULL");
-    inst->model_type = 0;
-    inst->polishafter = 0.0;
-    inst->randomseed = 0;
-    inst->use_cross_table = 0;
-    inst->multi = 0;
-    inst->num_threads = 4;
-    inst->time_limit = CPX_INFBOUND;
-    inst->iter_time = 30.0;
-    inst->hard_fix_prob = 0.5;
-
-    inst->time_limit_expired = 0;
-    
-    if (argc < 1) help = 1;
-
-    for (i = 1; i < argc; i++)
+int main_parse_command_line(int argc, char* argv[], instance *inst)
+{
+    try
     {
-        if (strcmp(argv[i],"-turbine_file") == 0) { strcpy(inst->turbine_input_file, argv[++i]); continue; }
-        if (strcmp(argv[i],"-cable_file") == 0) { strcpy(inst->cable_input_file, argv[++i]); continue; }
-        if (strcmp(argv[i],"-subs_cables") == 0) { inst->subs_cables = atoi(argv[++i]); continue; }
-        if (strcmp(argv[i],"-print_model") == 0) { inst->print_model = 1; continue; }
-        if (strcmp(argv[i],"-rins") == 0) { inst->rins = atoi(argv[++i]); continue; }						// rins
-        if (strcmp(argv[i],"-polishafter") == 0) { inst->polishafter = atof(argv[++i]); continue; }			// polishafter
-        if (strcmp(argv[i],"-time_limit") == 0) { inst->time_limit = atof(argv[++i]); continue; }           // total time limit
-        if (strcmp(argv[i],"-iter_time") == 0) { inst->iter_time = atof(argv[++i]); continue; }             // iteration time limit
-        if (strcmp(argv[i],"-hard_fix_prob") == 0) { inst->hard_fix_prob = atof(argv[++i]); continue; }     // hard fix probability
-        if (strcmp(argv[i],"-solver") == 0) { strcpy(inst->solver, argv[++i]); continue; }
-        if (strcmp(argv[i],"-slack_substation") == 0) { inst->slack_substation = 1; continue; } 			// add slack variable substation constraint
-        if (strcmp(argv[i],"-slack_flow") == 0) { inst->slack_flow = 1; continue; }                         // add slack variables flow constraints
-        if (strcmp(argv[i],"-seed") == 0) { inst->randomseed = abs(atoi(argv[++i])); continue; } 			// random seed
-        if (strcmp(argv[i],"-use_cross_table") == 0) { inst->use_cross_table = 1; continue; }               // use cross talbe
-        if (strcmp(argv[i],"-multi") == 0) { inst->multi = 1; continue; }                                   // use multi-thread code
-        if (strcmp(argv[i],"-num_threads") == 0) { inst->num_threads = atoi(argv[++i]); continue; } 		// n. threads
-        if (strcmp(argv[i],"-debug") == 0) { inst->debug = 1; continue; }
-        if (strcmp(argv[i],"-help") == 0) { help = 1; continue; }											// help
+        po::options_description desc("Allowed options");
+        desc.add_options()
+        ("help", "produce help message")
+        ("turbines", po::value<string>(&inst->turbine_input_file), "set turbine file path")
+        ("cables", po::value<string>(&inst->cable_input_file), "set cable file path")
+        ("subs_cables", po::value<int>(&inst->subs_cables)->default_value(999999), "set substation input cables number")
+        ("solver", po::value<string>(&inst->solver)->default_value("none"), "set solver")
+        ("print_model", po::value<bool>(&inst->print_model)->default_value(false), "print LP model after built")
+        ("time_limit", po::value<double>(&inst->time_limit)->default_value(CPX_INFBOUND), "set solver time limit")
+        ("iter_time", po::value<double>(&inst->iter_time)->default_value(30.0), "set iteration time (used for ...)")
+        ("hard_fix_prob", po::value<double>(&inst->hard_fix_prob)->default_value(0.5), "set hard fix probability")
+        ("polishafter", po::value<double>(&inst->polishafter)->default_value(1e75), "set cplex polishafter value")
+        ("rins", po::value<bool>(&inst->rins)->default_value(false), "if 1, set cplex rins value")
+        ("slack_subs", po::value<bool>(&inst->slack_substation)->default_value(false), "set slack for substation")
+        ("slack_flow", po::value<bool>(&inst->slack_flow)->default_value(false), "set slack variables for flows")
+        ("seed", po::value<int>(&inst->randomseed)->default_value(0), "set random seed")
+        ("cross_table", po::value<bool>(&inst->use_cross_table)->default_value(false), "set cross table optimization")
+        ("multi", po::value<bool>(&inst->multi)->default_value(false), "set multi-thread code")
+        ("threads", po::value<int>(&inst->num_threads)->default_value(4), "set number of threads");
+
+        po::variables_map vm;
+        po::store(po::parse_command_line(argc, argv, desc), vm);
+        po::notify(vm);
+
+        if (vm.count("help")) { cout << desc << "\n"; return 1; }
+
+        if (vm.count("turbines")) { cout << "Turbine file path set to " << vm["turbines"].as<string>() << ".\n"; }
+        else { cout << "Turbine file path not set. Exiting.\n"; return 1; }
+
+        if (vm.count("cables")) { cout << "Cable file path set to " << vm["cables"].as<string>() << ".\n"; }
+        else { cout << "Cable file path not set. Exiting.\n"; return 1; }
+
+        if (vm.count("subs_cables")) { cout << "Subs cables set to " << vm["subs_cables"].as<int>() << ".\n"; }
+        if (vm.count("solver")) { cout << "Solver set to " << vm["solver"].as<string>() << ".\n"; }
+        if (vm.count("time_limit")) { cout << "Time limit set to " << vm["time_limit"].as<double>() << ".\n"; }
+        if (vm.count("iter_time")) { cout << "Iteration time set to " << vm["iter_time"].as<double>() << ".\n"; }
+        if (vm.count("hard_fix_prob")) { cout << "Hard fix probability set to " << vm["hard_fix_prob"].as<double>() << ".\n"; }
+        if (vm.count("polishafter")) { cout << "CPLEX polishafter set to " << vm["polishafter"].as<double>() << ".\n"; }
+        
+        if (vm.count("print_model")) { cout << "Print model set to " << vm["print_model"].as<bool>() << ".\n"; }
+        if (vm.count("rins")) { cout << "CPLEX rins set to " << vm["rins"].as<bool>() << ".\n"; }
+        if (vm.count("slack_subs")) { cout << "Slack subs set to " << vm["slack_subs"].as<bool>() << ".\n"; }
+        if (vm.count("slack_flow")) { cout << "Slack flow set to " << vm["slack_flow"].as<bool>() << ".\n"; }
+        if (vm.count("cross_table")) { cout << "Cross table set to " << vm["cross_table"].as<bool>() << ".\n"; }
+        if (vm.count("multi")) { cout << "Multi set to " << vm["multi"].as<bool>() << ".\n"; }
+
+        if (vm.count("seed")) { cout << "Random seed set to " << vm["seed"].as<int>() << ".\n"; }
+        if (vm.count("threads")) { cout << "Number of threads set to " << vm["threads"].as<int>() << ".\n"; }
+    }
+    catch (exception &e)
+    {
+        cerr << "error: " << e.what() << "\n";
+        return 1;
+    }
+    catch (...)
+    {
+        cerr << "Exception of unknown type!\n";
     }
 
-    if (help || (VERBOSE >= 10))				// print current parameters
-    {
-        printf("\n*--- Available parameters (vers. 23-mar-2018) ---------------*\n\n");
-        printf("        turbine_file:   %s\n", inst->turbine_input_file);
-        printf("        cable_file:     %s\n", inst->cable_input_file);
-        printf("        subs_cables:    %d\n", inst->subs_cables);
-        printf("        print_model:    %d\n", inst->print_model);
-        printf("        rins:           %d\n", inst->rins);
-        printf("        polishafter:    %lf\n", inst->polishafter);
-        printf("        time_limit:     %lf\n", inst->time_limit);
-        printf("        iter_time:      %lf\n", inst->iter_time);
-        printf("        hard_fix_prob:  %lf\n", inst->hard_fix_prob);
-        printf("        solver:         %s\n", inst->solver);
-        printf("        slack_subs:     %d\n", inst->slack_substation);
-        printf("        slack_flow:     %d\n", inst->slack_flow);
-        printf("        seed:           %d\n", inst->randomseed);
-        printf("        cross_table:    %d\n", inst->use_cross_table);
-        printf("        multi:          %d\n", inst->multi);
-        printf("        threads:        %d\n", inst->num_threads);
-        printf("        enter -help for help\n\n");
-        printf("*--------------------------------------------------------------*\n\n");
-    }
-
-    if (help) exit(1);
+    return 0;
 }
 
-void main_read_input(instance *inst) {
+int main_read_input(instance *inst)
+{
     char line[100];
     int index, line_counter;
     int x, y, p;
@@ -128,7 +119,7 @@ void main_read_input(instance *inst) {
     FILE *fin;
 
     // TURBINES
-    fin = fopen(inst->turbine_input_file, "r");
+    fin = fopen(&inst->turbine_input_file[0], "r");
     if (fin == NULL) print_error("Turbine input file not found.");
 
     line_counter = 0;
@@ -147,7 +138,7 @@ void main_read_input(instance *inst) {
     inst->turb_powers = (double *) calloc(inst->n_turbines, sizeof(double));
 
     // read the file and insert data
-    fin = fopen(inst->turbine_input_file, "r");
+    fin = fopen(&inst->turbine_input_file[0], "r");
     for (index = 0; index < inst->n_turbines; index++)
     {
         if (!fscanf(fin, "%d %d %d", &x, &y, &p)) print_error("Wrong turbine file format.");
@@ -173,7 +164,7 @@ void main_read_input(instance *inst) {
 
 
     // CABLES
-    fin = fopen(inst->cable_input_file, "r");
+    fin = fopen(&inst->cable_input_file[0], "r");
     if (fin == NULL) print_error("Cable input file not found.");
 
     line_counter = 0;
@@ -191,7 +182,7 @@ void main_read_input(instance *inst) {
     inst->cable_costs = (double *) calloc(inst->n_cables, sizeof(double));
 
     // read the file and insert data
-    fin = fopen(inst->cable_input_file, "r");
+    fin = fopen(&inst->cable_input_file[0], "r");
     for (index = 0; index < inst->n_cables; index++)
     {
         if (!fscanf(fin, "%d %lf %lf", &p, &c, &l)) print_error("Wrong cable file format.");
@@ -202,4 +193,6 @@ void main_read_input(instance *inst) {
         if ( VERBOSE >= 1000 ) printf("power=%lf, cost=%lf\n", inst->cable_powers[index], inst->cable_costs[index]);
     }
     fclose(fin);
+
+    return 0;
 }

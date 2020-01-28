@@ -1,5 +1,5 @@
-turbine_file data/data_07.turb
-cable_file data/data_07.cbl
+turbines data/data_07.turb
+cables data/data_07.cbl
 subs_cables 10
 
 #solver: none, lazy, newrows, loop, callback, hardfix, VNS, simulated_annealing

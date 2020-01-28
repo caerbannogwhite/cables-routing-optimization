@@ -8,7 +8,7 @@ Alternatively, we implement two heuristic solvers that can run independently fro
 
 The original article we utilised to set up this project can be found [here](https://orbit.dtu.dk/en/publications/optimizing-wind-farm-cable-routing-considering-power-losses-2).
 
-The software requires **CPLEX**. Once you have installed it in your computer, you can change the `CPLEX_HOME` variable in `Makefile`.
+The software requires **[CPLEX](https://www.ibm.com/analytics/cplex-optimizer)** and the **[Boost library](https://www.boost.org/)**. Once you have installed them in your computer, you can change the `CPLEX_HOME` and the `BOOST_HOME` variables in `Makefile`.
 
 Here are some images of the connections computed by our solver.
 

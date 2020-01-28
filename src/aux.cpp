@@ -52,8 +52,8 @@ int no_cross_separation(instance *inst, double *xstar, int i, int j, int k, int 
     switch (inst->model_type)
     {
     case 2: // Model solved with loop method
-        cable1 = inst->xstar[ypos(i, j, inst)];
-        cable2 = inst->xstar[ypos(k, h, inst)];
+        cable1 = inst->xstar[y_pos(i, j, inst)];
+        cable2 = inst->xstar[y_pos(k, h, inst)];
 
         return cable1 > EPSILON_MED && cable2 > EPSILON_MED && cross == 1;
         break;
@@ -61,13 +61,13 @@ int no_cross_separation(instance *inst, double *xstar, int i, int j, int k, int 
 
         if (inst->multi)
         {
-            cable1 = inst->xstar_vector[thread][ypos(i, j, inst)];
-            cable2 = inst->xstar_vector[thread][ypos(k, h, inst)];
+            cable1 = inst->xstar_vector[thread][y_pos(i, j, inst)];
+            cable2 = inst->xstar_vector[thread][y_pos(k, h, inst)];
         }
         else
         {
-            cable1 = xstar[ypos(i, j, inst)];
-            cable2 = xstar[ypos(k, h, inst)];
+            cable1 = xstar[y_pos(i, j, inst)];
+            cable2 = xstar[y_pos(k, h, inst)];
         }
 
         return cable1 > EPSILON_MED && cable2 > EPSILON_MED && cross == 1;
@@ -101,7 +101,7 @@ int compute_no_cross_cuts(instance *inst, CPXCENVptr env, CPXLPptr lp, int threa
 
                 // LOOP TASK: non serve controllare: nella soluzione trovata da CPLEX gli archi (i,j) e
                 // (j,i) non sono stati scelti.
-                if (inst->model_type == LOOP_TASK_MODEL_TYPE && (inst->xstar[ypos(i, j, inst)] + inst->xstar[ypos(j, i, inst)] < EPSILON_SMALL))
+                if (inst->model_type == LOOP_TASK_MODEL_TYPE && (inst->xstar[y_pos(i, j, inst)] + inst->xstar[y_pos(j, i, inst)] < EPSILON_SMALL))
                     continue;
 
                 nzcnt = 0;
@@ -112,7 +112,7 @@ int compute_no_cross_cuts(instance *inst, CPXCENVptr env, CPXLPptr lp, int threa
 
                     if (no_cross_separation(inst, NULL, i, j, k, h, thread, inst->use_cross_table))
                     {
-                        rmatind[nzcnt] = ypos(k, h, inst);
+                        rmatind[nzcnt] = y_pos(k, h, inst);
                         rmatval[nzcnt] = 1.0;
                         nzcnt++;
                     }
@@ -120,11 +120,11 @@ int compute_no_cross_cuts(instance *inst, CPXCENVptr env, CPXLPptr lp, int threa
 
                 if (nzcnt > 0)
                 {
-                    rmatind[nzcnt] = ypos(i, j, inst);
+                    rmatind[nzcnt] = y_pos(i, j, inst);
                     rmatval[nzcnt] = 1.0;
                     nzcnt++;
 
-                    rmatind[nzcnt] = ypos(j, i, inst);
+                    rmatind[nzcnt] = y_pos(j, i, inst);
                     rmatval[nzcnt] = 1.0;
                     nzcnt++;
 
@@ -191,7 +191,7 @@ int CPXPUBLIC callback_cross_multi(CPXCENVptr env, void *cbdata, int wherefrom, 
     {
         for (j = i + 1; j < inst->n_turbines; ++j)
         {
-            if (inst->xstar_vector[mythread][ypos(i, j, inst)] + inst->xstar_vector[mythread][ypos(j, i, inst)] < EPSILON_SMALL)
+            if (inst->xstar_vector[mythread][y_pos(i, j, inst)] + inst->xstar_vector[mythread][y_pos(j, i, inst)] < EPSILON_SMALL)
                 continue;
 
             for (k = 0; k < inst->n_turbines; ++k)
@@ -204,7 +204,7 @@ int CPXPUBLIC callback_cross_multi(CPXCENVptr env, void *cbdata, int wherefrom, 
 
                     if (no_cross_separation(inst, NULL, i, j, k, h, mythread, inst->use_cross_table))
                     {
-                        inst->indeces_vector[mythread][nzcnt] = ypos(k, h, inst);
+                        inst->indeces_vector[mythread][nzcnt] = y_pos(k, h, inst);
                         inst->values_vector[mythread][nzcnt] = 1.0;
 
                         nzcnt++;
@@ -212,11 +212,11 @@ int CPXPUBLIC callback_cross_multi(CPXCENVptr env, void *cbdata, int wherefrom, 
                 }
                 if (nzcnt > 0)
                 {
-                    inst->indeces_vector[mythread][nzcnt] = ypos(i, j, inst);
+                    inst->indeces_vector[mythread][nzcnt] = y_pos(i, j, inst);
                     inst->values_vector[mythread][nzcnt] = 1.0;
                     nzcnt++;
 
-                    inst->indeces_vector[mythread][nzcnt] = ypos(j, i, inst);
+                    inst->indeces_vector[mythread][nzcnt] = y_pos(j, i, inst);
                     inst->values_vector[mythread][nzcnt] = 1.0;
                     nzcnt++;
 
@@ -259,7 +259,7 @@ int CPXPUBLIC callback_cross_single(CPXCENVptr env, void *cbdata, int wherefrom,
     {
         for (j = 0; j < inst->n_turbines; ++j)
         {
-            if (xstar[ypos(i, j, inst)] + xstar[ypos(j, i, inst)] < EPSILON_SMALL)
+            if (xstar[y_pos(i, j, inst)] + xstar[y_pos(j, i, inst)] < EPSILON_SMALL)
                 continue;
 
             for (k = 0; k < inst->n_turbines; ++k)
@@ -267,22 +267,22 @@ int CPXPUBLIC callback_cross_single(CPXCENVptr env, void *cbdata, int wherefrom,
                 nzcnt = 0;
                 for (h = 0; h < inst->n_turbines; ++h)
                 {
-                    //if ((xstar[ypos(i, j, inst)] > EPSILON_MED) && (xstar[ypos(k, h, inst)] > EPSILON_MED) && get_cross_table(inst, inst->cross_table, i, j, k, h))
-                    if ((xstar[ypos(i, j, inst)] > EPSILON_MED) && (xstar[ypos(k, h, inst)] > EPSILON_MED) && no_cross_separation(inst, xstar, i, j, k, h, mythread, inst->use_cross_table))
+                    //if ((xstar[y_pos(i, j, inst)] > EPSILON_MED) && (xstar[y_pos(k, h, inst)] > EPSILON_MED) && get_cross_table(inst, inst->cross_table, i, j, k, h))
+                    if ((xstar[y_pos(i, j, inst)] > EPSILON_MED) && (xstar[y_pos(k, h, inst)] > EPSILON_MED) && no_cross_separation(inst, xstar, i, j, k, h, mythread, inst->use_cross_table))
 
                     {
-                        indeces[nzcnt] = ypos(k, h, inst);
+                        indeces[nzcnt] = y_pos(k, h, inst);
                         values[nzcnt] = 1.0;
                         nzcnt++;
                     }
                 }
                 if (nzcnt > 0)
                 {
-                    indeces[nzcnt] = ypos(i, j, inst);
+                    indeces[nzcnt] = y_pos(i, j, inst);
                     values[nzcnt] = 1.0;
                     nzcnt++;
 
-                    indeces[nzcnt] = ypos(j, i, inst);
+                    indeces[nzcnt] = y_pos(j, i, inst);
                     values[nzcnt] = 1.0;
                     nzcnt++;
 

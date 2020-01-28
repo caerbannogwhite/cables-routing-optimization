@@ -3,7 +3,8 @@
 #include "aux.h"
 #include "heur.h"
 
-int WFopt(instance *inst) {
+int WFopt(instance *inst)
+{
     int error, i, j, k;
     FILE *fout;
 
@@ -13,8 +14,8 @@ int WFopt(instance *inst) {
     inst->xstart = -1;
     inst->sstart = -1;
 
-    printf("%s Start building model.\n", get_log());
-    if (!(strcmp(inst->solver, "VNS") == 0 || strcmp(inst->solver, "simulated_annealing") == 0))
+    printf("Start building model.\n");
+    if (!(inst->solver.compare("VNS") == 0 || inst->solver.compare("simulated_annealing") == 0))
     {
         // OPEN CPLEX
         CPXENVptr env = CPXopenCPLEX(&error);
@@ -48,7 +49,7 @@ int WFopt(instance *inst) {
         // random seed
         if (inst->randomseed != 0) CPXsetintparam(env, CPX_PARAM_RANDOMSEED, abs(inst->randomseed));
 
-        if (strcmp(inst->solver, "none") == 0)
+        if (inst->solver.compare("none") == 0)
         {
             build_model(inst, env, lp);
             if (inst->print_model) CPXwriteprob(env, lp, "model.lp", NULL);
@@ -58,7 +59,7 @@ int WFopt(instance *inst) {
             inst->xstar = (double *) calloc(sizeof(double), inst->ncols);
             CPXgetx(env, lp, inst->xstar, 0, inst->ncols-1);
         }
-        else if (strcmp(inst->solver, "lazy") == 0)
+        else if (inst->solver.compare("lazy") == 0)
         {
             inst->model_type = LAZY_CONST_MODEL_TYPE;
             build_model_cross_constraints(inst, env, lp);
@@ -69,7 +70,7 @@ int WFopt(instance *inst) {
             inst->xstar = (double *) calloc(inst->ncols, sizeof(double));
             CPXgetx(env, lp, inst->xstar, 0, inst->ncols-1);
         }
-        else if (strcmp(inst->solver, "newrows") == 0)
+        else if (inst->solver.compare("newrows") == 0)
         {
             inst->model_type = NEW_ROWS_MODEL_TYPE;
             build_model_cross_constraints(inst, env, lp);
@@ -80,20 +81,20 @@ int WFopt(instance *inst) {
             inst->xstar = (double *) calloc(inst->ncols, sizeof(double));
             CPXgetx(env, lp, inst->xstar, 0, inst->ncols-1);
         }
-        else if (strcmp(inst->solver, "loop") == 0)
+        else if (inst->solver.compare("loop") == 0)
         {
             // build the default model
             build_model(inst, env, lp);
             inst->xstar = (double *) calloc(inst->ncols, sizeof(double));
             loop_solver(inst, env, lp);
         }
-        else if (strcmp(inst->solver, "callback") == 0)
+        else if (inst->solver.compare("callback") == 0)
         {
             callback_solver(inst, env, lp);
             inst->xstar = (double *) calloc(inst->ncols, sizeof(double));
-            if (CPXgetx(env, lp, inst->xstar, 0, inst->ncols-1)) printf("%s Error: CPXgetx no solution. \n", get_log());;
+            if (CPXgetx(env, lp, inst->xstar, 0, inst->ncols-1)) printf("Error: CPXgetx no solution. \n");;
         }
-        else if (strcmp(inst->solver, "hardfix") == 0)
+        else if (inst->solver.compare("hardfix") == 0)
         {
             inst->model_type = LAZY_CONST_MODEL_TYPE;
             build_model_cross_constraints(inst, env, lp);
@@ -110,21 +111,19 @@ int WFopt(instance *inst) {
         //if (strcmp(inst->solver, "hardfix") == 0)
         //{
         //    CPXgetbestobjval(env, lp, &inst->best_lb);
-        //    printf("\n%s Best obj-val=%lf\n", get_log(), inst->best_lb);
         //    CPXgetobjval(env, lp, &inst->obj_val);
-        //    printf("%s Best integer=%lf\n", get_log(), inst->obj_val);
         //}
 
         // free pools and close cplex model
-        printf("%s Closing CPLEX.\n", get_log());
+        printf("Closing CPLEX.\n");
         CPXfreeprob(env, &lp);
         CPXcloseCPLEX(&env);
     }
-    else if (strcmp(inst->solver, "VNS") == 0)
+    else if (inst->solver.compare("VNS") == 0)
     {
         heur_VNS_launcher(inst);
     }
-    else if (strcmp(inst->solver, "simulated_annealing") == 0)
+    else if (inst->solver.compare("simulated_annealing") == 0)
     {
         heur_simulated_annealing_launcher(inst);
     }
@@ -138,7 +137,7 @@ int WFopt(instance *inst) {
     for (i = 0; i < inst->n_turbines; i++)
     {
         for (j = 0; j < inst->n_turbines; j++)
-            if (inst->xstar[fpos(i, j, inst)] > EPSILON_SMALL) fprintf(fout, "f %d %d %d %lf\n", i, j, -1, inst->xstar[fpos(i, j, inst)]);
+            if (inst->xstar[f_pos(i, j, inst)] > EPSILON_SMALL) fprintf(fout, "f %d %d %d %lf\n", i, j, -1, inst->xstar[f_pos(i, j, inst)]);
     }
 
     for (i = 0; i < inst->n_turbines; i++)
@@ -146,21 +145,22 @@ int WFopt(instance *inst) {
         for (j = 0; j < inst->n_turbines; j++)
         {
             for (k = 0; k < inst->n_cables; k++)
-                if (inst->xstar[xpos(i, j, k, inst)] > EPSILON_SMALL) fprintf(fout, "x %d %d %d %lf\n", i, j, k, inst->xstar[xpos(i, j, k, inst)]);
+                if (inst->xstar[x_pos(i, j, k, inst)] > EPSILON_SMALL) fprintf(fout, "x %d %d %d %lf\n", i, j, k, inst->xstar[x_pos(i, j, k, inst)]);
         }
     }
 
     for (i = 0; i < inst->n_turbines; i++)
     {
         for (j = 0; j < inst->n_turbines; j++)
-            if (inst->xstar[ypos(i, j, inst)] > EPSILON_SMALL) fprintf(fout, "y %d %d %d %lf\n", i, j, -1, inst->xstar[ypos(i, j, inst)]);
+            if (inst->xstar[y_pos(i, j, inst)] > EPSILON_SMALL) fprintf(fout, "y %d %d %d %lf\n", i, j, -1, inst->xstar[y_pos(i, j, inst)]);
     } 
     fclose(fout);
 
     return 0;
 }
 
-void build_model(instance *inst, CPXENVptr env, CPXLPptr lp) {
+void build_model(instance *inst, CPXENVptr env, CPXLPptr lp)
+{
     char binary = 'B';
     char continuous = 'C';
     char integer = 'I';
@@ -184,7 +184,7 @@ void build_model(instance *inst, CPXENVptr env, CPXLPptr lp) {
     // add general integer var f(i,j): value of current flow in (i,j)
     if (inst->fstart != -1) print_error("Error in build_model0(): var f cannot be redefined.");
     inst->fstart = CPXgetnumcols(env,lp);
-    printf("%s Adding f variables to the model at column %d.\n", get_log(), inst->fstart);
+    printf("Adding f variables to the model at column %d.\n", inst->fstart);
     for (i = 0; i < inst->n_turbines; i++)
     {
         for (j = 0; j < inst->n_turbines; j++)
@@ -204,14 +204,14 @@ void build_model(instance *inst, CPXENVptr env, CPXLPptr lp) {
             // xctype: general integer
             // colname: name of the variable
             if (CPXnewcols(env, lp, 1, NULL, &zero, &up, &continuous, cname)) print_error(" wrong CPXnewcols on f vars.");
-            if (CPXgetnumcols(env,lp)-1 != fpos(i, j, inst)) print_error(" wrong position for f vars.");
+            if (CPXgetnumcols(env,lp)-1 != f_pos(i, j, inst)) print_error(" wrong position for f vars.");
         }
     }
 
     // add binary var x(i,j,k): in connecting (i,j) a k-value cable is used
     if (inst->xstart != -1) print_error("Error in build_model0(): var x cannot be redefined.");
     inst->xstart = CPXgetnumcols(env,lp);
-    printf("%s Adding x variables to the model at column %d.\n", get_log(), inst->xstart);
+    printf("Adding x variables to the model at column %d.\n", inst->xstart);
     for (i = 0; i < inst->n_turbines; i++)
     {
         for (j = 0; j < inst->n_turbines; j++)
@@ -227,7 +227,7 @@ void build_model(instance *inst, CPXENVptr env, CPXLPptr lp) {
 
                 // obj: objective function coefficient, cost(x) * dist(x)
                 if (CPXnewcols(env, lp, 1, &obj, &zero, &up, &binary, cname)) print_error(" wrong CPXnewcols on x vars.");
-                if (CPXgetnumcols(env,lp)-1 != xpos(i, j, k, inst)) print_error(" wrong position for x vars.");
+                if (CPXgetnumcols(env,lp)-1 != x_pos(i, j, k, inst)) print_error(" wrong position for x vars.");
             }
         }
     }
@@ -235,7 +235,7 @@ void build_model(instance *inst, CPXENVptr env, CPXLPptr lp) {
     // add binary var y(i,j): connection in (i,j)
     if (inst->ystart != -1) print_error("Error in build_model0(): var y cannot be redefined.");
     inst->ystart = CPXgetnumcols(env,lp);
-    printf("%s Adding y variables to the model at column %d.\n", get_log(), inst->ystart);
+    printf("Adding y variables to the model at column %d.\n", inst->ystart);
     for (i = 0; i < inst->n_turbines; i++)
     {
         for (j = 0; j < inst->n_turbines; j++)
@@ -247,7 +247,7 @@ void build_model(instance *inst, CPXENVptr env, CPXLPptr lp) {
             sprintf(cname[0], "y(%d,%d)", i, j);
 
             if (CPXnewcols(env, lp, 1, NULL, &zero, &up, &binary, cname)) print_error(" wrong CPXnewcols on y vars.");
-            if (CPXgetnumcols(env,lp)-1 != ypos(i, j, inst)) print_error(" wrong position for y vars.");
+            if (CPXgetnumcols(env,lp)-1 != y_pos(i, j, inst)) print_error(" wrong position for y vars.");
         }
     }
 
@@ -255,7 +255,7 @@ void build_model(instance *inst, CPXENVptr env, CPXLPptr lp) {
     if (inst->slack_substation)
     {
         inst->sstart = CPXgetnumcols(env,lp);
-        printf("%s Adding s variable at column %d.\n", get_log(), inst->sstart);
+        printf("Adding s variable at column %d.\n", inst->sstart);
         sprintf(cname[0], "s(0)");
         if (CPXnewcols(env, lp, 1, &obj_slack, &zero, NULL, &integer, cname)) print_error("Wrong CPXnewcols() on slack variables.");
     }
@@ -264,7 +264,7 @@ void build_model(instance *inst, CPXENVptr env, CPXLPptr lp) {
     if (inst->slack_flow)
     {
         inst->lstart = CPXgetnumcols(env,lp);
-        printf("%s Adding l variables at column %d.\n", get_log(), inst->lstart);
+        printf("Adding l variables at column %d.\n", inst->lstart);
 
         for (i = 0; i < inst->n_turbines; ++i)
         {
@@ -276,7 +276,7 @@ void build_model(instance *inst, CPXENVptr env, CPXLPptr lp) {
 
     // ROWS
     // turbine (and substation) out-degree constraints
-    printf("%s Adding turbine out-degree constraints at row %d.\n", get_log(), CPXgetnumrows(env,lp));
+    printf("Adding turbine out-degree constraints at row %d.\n", CPXgetnumrows(env,lp));
     for (h = 0; h < inst->n_turbines; ++h)
     {
         lastrow = CPXgetnumrows(env,lp);
@@ -301,11 +301,11 @@ void build_model(instance *inst, CPXENVptr env, CPXLPptr lp) {
             if (CPXnewrows(env, lp, 1, &one, &equal, NULL, cname)) print_error("Wrong CPXnewrows() on turbine out-degree.");
         }
         for (j = 0; j < inst->n_turbines; j++)
-            if (CPXchgcoef(env, lp, lastrow, ypos(h, j, inst), 1.0)) print_error("Wrong CPXchgcoef() on turbine out-degree.");
+            if (CPXchgcoef(env, lp, lastrow, y_pos(h, j, inst), 1.0)) print_error("Wrong CPXchgcoef() on turbine out-degree.");
     }
 
     // substation in-degree constraint
-    printf("%s Adding substation in-degree constraint at row %d.\n", get_log(), CPXgetnumrows(env,lp));
+    printf("Adding substation in-degree constraint at row %d.\n", CPXgetnumrows(env,lp));
     for (h = 0; h < inst->n_turbines; ++h)
     {
         if (inst->turb_powers[h] < -0.5)
@@ -318,13 +318,13 @@ void build_model(instance *inst, CPXENVptr env, CPXLPptr lp) {
 
             if (CPXnewrows(env, lp, 1, &rhs, &less_equal, NULL, cname)) print_error("Wrong CPXnewrows() on substation in-degree.");
             for (i = 0; i < inst->n_turbines; i++)
-                if (CPXchgcoef(env, lp, lastrow, ypos(i, h, inst), 1.0)) print_error("Wrong CPXchgcoef() on substation in-degree.");
+                if (CPXchgcoef(env, lp, lastrow, y_pos(i, h, inst), 1.0)) print_error("Wrong CPXchgcoef() on substation in-degree.");
             break;
         }
     }
 
     // turbine flow constraints
-    printf("%s Adding turbine flow constraints at row %d.\n", get_log(), CPXgetnumrows(env,lp));
+    printf("Adding turbine flow constraints at row %d.\n", CPXgetnumrows(env,lp));
     inst->flow_constraints_start = CPXgetnumrows(env, lp);
     for (h = 0; h < inst->n_turbines; ++h)
     {
@@ -336,21 +336,21 @@ void build_model(instance *inst, CPXENVptr env, CPXLPptr lp) {
         {
             if (CPXnewrows(env, lp, 1, &zero, &less_equal, NULL, cname)) print_error("Wrong CPXnewrows() on flow constraints.");
             for (j = 0; j < inst->n_turbines; j++)
-                if (CPXchgcoef(env, lp, lastrow, fpos(h, j, inst), 1.0)) print_error("Wrong CPXchgcoef() on flow constraints.");
+                if (CPXchgcoef(env, lp, lastrow, f_pos(h, j, inst), 1.0)) print_error("Wrong CPXchgcoef() on flow constraints.");
             for (i = 0; i < inst->n_turbines; i++)
-                if (CPXchgcoef(env, lp, lastrow, fpos(i, h, inst), -1.0)) print_error("Wrong CPXchgcoef() on flow constraints.");
+                if (CPXchgcoef(env, lp, lastrow, f_pos(i, h, inst), -1.0)) print_error("Wrong CPXchgcoef() on flow constraints.");
         } else
         {
             if (CPXnewrows(env, lp, 1, &inst->turb_powers[h], &equal, NULL, cname)) print_error("Wrong CPXnewrows() on flow constraints.");
             for (j = 0; j < inst->n_turbines; j++)
-                if (CPXchgcoef(env, lp, lastrow, fpos(h, j, inst), 1.0)) print_error("Wrong CPXchgcoef() on flow constraints.");
+                if (CPXchgcoef(env, lp, lastrow, f_pos(h, j, inst), 1.0)) print_error("Wrong CPXchgcoef() on flow constraints.");
             for (i = 0; i < inst->n_turbines; i++)
-                if (CPXchgcoef(env, lp, lastrow, fpos(i, h, inst), -1.0)) print_error("Wrong CPXchgcoef() on flow constraints.");
+                if (CPXchgcoef(env, lp, lastrow, f_pos(i, h, inst), -1.0)) print_error("Wrong CPXchgcoef() on flow constraints.");
         }
     }
 
     // link constraints
-    printf("%s Adding link constraints at row %d.\n", get_log(), CPXgetnumrows(env,lp));
+    printf("Adding link constraints at row %d.\n", CPXgetnumrows(env,lp));
     for (i = 0; i < inst->n_turbines; ++i)
     {
         for (j = 0; j < inst->n_turbines; j++)
@@ -361,14 +361,14 @@ void build_model(instance *inst, CPXENVptr env, CPXLPptr lp) {
 
             if (CPXnewrows(env, lp, 1, &zero, &equal, NULL, cname)) print_error("Wrong CPXnewrows() on link constraints.");
             for (k = 0; k < inst->n_cables; k++)
-                if (CPXchgcoef(env, lp, lastrow, xpos(i, j, k, inst), 1.0)) print_error("Wrong CPXchgcoef() on link constraints.");
+                if (CPXchgcoef(env, lp, lastrow, x_pos(i, j, k, inst), 1.0)) print_error("Wrong CPXchgcoef() on link constraints.");
 
-            if (CPXchgcoef(env, lp, lastrow, ypos(i, j, inst), -1.0)) print_error("Wrong CPXchgcoef() on link constraints.");
+            if (CPXchgcoef(env, lp, lastrow, y_pos(i, j, inst), -1.0)) print_error("Wrong CPXchgcoef() on link constraints.");
         }
     }
 
     // capacity link constraints
-    printf("%s Adding capacity link constraints at row %d.\n", get_log(), CPXgetnumrows(env,lp));
+    printf("Adding capacity link constraints at row %d.\n", CPXgetnumrows(env,lp));
     for (i = 0; i < inst->n_turbines; ++i)
     {
         for (j = 0; j < inst->n_turbines; j++)
@@ -379,9 +379,9 @@ void build_model(instance *inst, CPXENVptr env, CPXLPptr lp) {
 
             if (CPXnewrows(env, lp, 1, &zero, &greater_equal, NULL, cname)) print_error("Wrong CPXnewrows() on capacity link constraints.");
             for (k = 0; k < inst->n_cables; k++)
-                if (CPXchgcoef(env, lp, lastrow, xpos(i, j, k, inst), inst->cable_powers[k])) print_error("Wrong CPXchgcoef() on capacity link constraints.");
+                if (CPXchgcoef(env, lp, lastrow, x_pos(i, j, k, inst), inst->cable_powers[k])) print_error("Wrong CPXchgcoef() on capacity link constraints.");
 
-            if (CPXchgcoef(env, lp, lastrow, fpos(i, j, inst), -1.0)) print_error("Wrong CPXchgcoef() on capacity link constraints.");
+            if (CPXchgcoef(env, lp, lastrow, f_pos(i, j, inst), -1.0)) print_error("Wrong CPXchgcoef() on capacity link constraints.");
         }
     }
 
@@ -389,14 +389,14 @@ void build_model(instance *inst, CPXENVptr env, CPXLPptr lp) {
     if (inst->slack_substation)
     {
         // substation in-degree constraint
-        printf("%s Changing substation in-degree constraint at row %d.\n", get_log(), inst->indeg_constraint);
+        printf("Changing substation in-degree constraint at row %d.\n", inst->indeg_constraint);
         if (CPXchgcoef(env, lp, inst->indeg_constraint, inst->sstart, -1.0)) print_error("Wrong CPXchgcoef() on slack variables.");
     }
 
     if (inst->slack_flow)
     {
         // flow constraints
-        printf("%s Changing flow constraints at row %d.\n", get_log(), inst->flow_constraints_start);
+        printf("Changing flow constraints at row %d.\n", inst->flow_constraints_start);
         for (i = 0; i < inst->n_turbines; ++i)
         {
             if (CPXchgcoef(env, lp, inst->flow_constraints_start + i, inst->lstart + i, 1.0)) print_error("Wrong CPXchgcoef() on slack variables.");
@@ -422,9 +422,9 @@ void build_model_cross_constraints(instance *inst, CPXENVptr env, CPXLPptr lp) {
     CPXsetintparam(env,CPX_PARAM_REDUCE, CPX_PREREDUCE_NOPRIMALORDUAL);
 
     // add non-crossing contraints
-    printf("%s Adding non-crossing contraints at row %d.\n", get_log(), CPXgetnumrows(env, lp));
+    printf("Adding non-crossing contraints at row %d.\n", CPXgetnumrows(env, lp));
     int ncuts = compute_no_cross_cuts(inst, env, lp, -1);
-    printf("%s Added %d lazy (or new rows) constraints.\n", get_log(), ncuts);
+    printf("Added %d lazy (or new rows) constraints.\n", ncuts);
 
     inst->ncols = CPXgetnumcols(env, lp);
 
@@ -452,7 +452,7 @@ void loop_solver(instance *inst, CPXENVptr env, CPXLPptr lp) {
     {
         if (is_time_limit_expired(inst))
         {
-            printf("%s LOOP TASK: time limit expired.\n", get_log());
+            printf("LOOP TASK: time limit expired.\n");
             break;
         }
 
@@ -462,7 +462,7 @@ void loop_solver(instance *inst, CPXENVptr env, CPXLPptr lp) {
 
         if (CPXgetbestobjval(env, lp, &inst->best_lb))
         {
-            printf("%s LOOP TASK: no solution found.\n", get_log());
+            printf("LOOP TASK: no solution found.\n");
             continue;	// no solution found
         }
 
@@ -586,9 +586,9 @@ void hardfix_solver(instance *inst, CPXENVptr env, CPXLPptr lp) {
     } while (prev_obj_val >= (inst->obj_val + EPSILON_SMALL) && !is_time_limit_expired(inst)); // TODO trovare condizione
 
     //CPXgetbestobjval(env, lp, &inst->best_lb);
-    printf("\n%s Best obj-val=%lf\n", get_log(), inst->best_lb);
+    printf("\nBest obj-val=%lf\n", inst->best_lb);
     //CPXgetobjval(env, lp, &inst->obj_val);
-    printf("%s Best integer=%lf\n", get_log(), inst->obj_val);
+    printf("Best integer=%lf\n", inst->obj_val);
 }
 
 void print_error(const char *err) {
@@ -610,7 +610,7 @@ int is_time_limit_expired(instance *inst) {
     if (tspan > inst->time_limit)
     {
         if (VERBOSE >= 100)
-            printf("%s Time limit of %lf expired.\n", get_log(), inst->time_limit);
+            printf("Time limit of %lf expired.\n", inst->time_limit);
         inst->time_limit_expired = 1;
         return 1;
     }
@@ -625,7 +625,7 @@ double get_time_elapsed(instance *inst) {
 
 int mip_solved_to_optimality(CPXENVptr env, CPXLPptr lp) {
     int lpstat = CPXgetstat(env, lp);
-    printf("%s CPLEX lpstat %d\n", get_log(), lpstat);
+    printf("CPLEX lpstat %d\n", lpstat);
     int solved = (lpstat == CPXMIP_OPTIMAL) ||
                  (lpstat == CPXMIP_OPTIMAL_INFEAS) ||
                  //( lpstat ==  CPXMIP_OPTIMAL_RELAXED ) ||

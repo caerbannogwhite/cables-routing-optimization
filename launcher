@@ -9,10 +9,10 @@ from time import strftime
 EPSILON_SMALL = 10e-9
 
 def launch(i, tb, report_fh, launcher_params, solver_params):
-	args = ['./bin/WindFarmOptimizationMain']
+	args = ['./bin/wfsolver']
 	for param in list(solver_params.keys()):
-		if param == 'turbine_file': solver_params[param] = tb[1]
-		if param == 'cable_file':	solver_params[param] = tb[0]
+		if param == 'turbines': solver_params[param] = tb[1]
+		if param == 'cables':	solver_params[param] = tb[0]
 		if param == 'subs_cables':	solver_params[param] = tb[2]
 
 		args.append('-' + param)
@@ -85,12 +85,12 @@ def plot(solver_params, save=False):
 	turbines = list()
 	cables = list()
 	
-	turbine_file = open(solver_params['turbine_file'], 'r')
+	turbine_file = open(solver_params['turbines'], 'r')
 	for line in turbine_file:
 		turbines.append([float(i) for i in line.split()])
 	turbine_file.close()
 	
-	cable_file = open(solver_params['cable_file'], 'r')
+	cable_file = open(solver_params['cables'], 'r')
 	for line in cable_file:
 		cables.append([float(i) for i in line.split()])
 	cable_file.close()
@@ -180,7 +180,7 @@ def get_results(i, report_fh, solver_params):
 	solver = solver_params['solver']
 	time = solver_params['time_limit']
 	seed = solver_params['seed']
-	tb_num = int(solver_params['turbine_file'].split('_')[1].split('.')[0])
+	tb_num = int(solver_params['turbines'].split('_')[1].split('.')[0])
 	best_integer = 0.0
 	best_obj_val = 0.0
 	gap = 0.0

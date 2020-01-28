@@ -139,8 +139,8 @@ int preds_to_solution(instance *inst, int *preds, double *solution) {
     {
         if (i == preds[i]) continue;
 
-        solution[fpos(i, preds[i], inst)] = inst->streams[i] + 1;
-        solution[ypos(i, preds[i], inst)] = 1.0;
+        solution[f_pos(i, preds[i], inst)] = inst->streams[i] + 1;
+        solution[y_pos(i, preds[i], inst)] = 1.0;
 
         for (j = 0; j < inst->n_cables; ++j)
         {
@@ -149,11 +149,11 @@ int preds_to_solution(instance *inst, int *preds, double *solution) {
 
         if (inst->cable_powers[inst->n_cables - 1] < inst->streams[i] + 1)
         {
-            solution[xpos(i, preds[i], inst->n_cables - 1, inst)] = 1.0;
+            solution[x_pos(i, preds[i], inst->n_cables - 1, inst)] = 1.0;
         }
         else
         {
-            solution[xpos(i, preds[i], j, inst)] = 1.0; 
+            solution[x_pos(i, preds[i], j, inst)] = 1.0; 
         }
     }
 
@@ -168,24 +168,17 @@ double VNS(instance *inst, int *preds, double best_score) {
     //best_score = evaluate_preds(inst, preds, DBL_MAX, 0);
     //printf("start: best_score=%lf\n", best_score);
 
-    while (1)
-    {
+    while (1) {
         oom_best_score = one_opt_move(inst, preds, best_score);
 
         // Local optimum not reached yet
-        if (best_score > oom_best_score)
-        {
-            //printf("%s     Optimum not reaced: best_score = %.4e, oom_score = %.4e\n", get_log(), best_score, oom_best_score);
+        if (best_score > oom_best_score) {
             best_score = oom_best_score;
             oom_improvement = 1;
-
-            //printf("%s time_elapsed=%lf Solution found with score=%.4e\n", get_log(), get_time_elapsed(inst), best_score);
         }
 
         // Local optimum reached: launching 3-opt move
-        else
-        {
-            //printf("%s   Local optimum found with score = %.4e. Launching TOM.\n", get_log(), best_score);
+        else {
             if (oom_improvement) {
                 //score = three_opt_move(inst, preds, best_score);
                 oom_improvement = 0;
@@ -205,7 +198,7 @@ double VNS(instance *inst, int *preds, double best_score) {
                 for (i = 0; i < inst->ncols; ++i) inst->xstar[i] = inst->solution[i];
                 best_score = eval_preds;
 
-                printf("%s time_elapsed=%lf Solution found with score=%.4e\n", get_log(), get_time_elapsed(inst), best_score);
+                printf("time_elapsed=%lf Solution found with score=%.4e\n", get_time_elapsed(inst), best_score);
             }
         }
 
@@ -397,8 +390,8 @@ double evaluate_preds(instance *inst, int *preds, double best_score, int log) {
     {
         if (i == preds[i]) continue;
 
-        inst->solution[fpos(i, preds[i], inst)] = inst->streams[i] + 1;
-        inst->solution[ypos(i, preds[i], inst)] = 1.0;
+        inst->solution[f_pos(i, preds[i], inst)] = inst->streams[i] + 1;
+        inst->solution[y_pos(i, preds[i], inst)] = 1.0;
 
         for (j = 0; j < inst->n_cables; ++j)
         {
@@ -407,18 +400,18 @@ double evaluate_preds(instance *inst, int *preds, double best_score, int log) {
 
         if (inst->cable_powers[inst->n_cables - 1] < inst->streams[i] + 1)
         {
-            inst->solution[xpos(i, preds[i], inst->n_cables - 1, inst)] = 1.0;
+            inst->solution[x_pos(i, preds[i], inst->n_cables - 1, inst)] = 1.0;
         }
         else
         {
-            inst->solution[xpos(i, preds[i], j, inst)] = 1.0; 
+            inst->solution[x_pos(i, preds[i], j, inst)] = 1.0; 
         }
     }
 
     // evaluate C and total stream
     for (i = 0; i < inst->n_turbines; ++i)
     {
-        if (inst->solution[fpos(i, inst->subs_index, inst)] > EPSILON_MED)
+        if (inst->solution[f_pos(i, inst->subs_index, inst)] > EPSILON_MED)
         {
             ++in_deg_cnt;
         }
@@ -434,18 +427,18 @@ double evaluate_preds(instance *inst, int *preds, double best_score, int log) {
     {
         for (j = 0; j < inst->n_turbines; ++j)
         {
-            if (inst->solution[fpos(i, j, inst)] > EPSILON_SMALL)
+            if (inst->solution[f_pos(i, j, inst)] > EPSILON_SMALL)
             {
-                if ((inst->solution[fpos(i, j, inst)] - inst->cable_powers[inst->n_cables - 1]) > EPSILON_SMALL)
+                if ((inst->solution[f_pos(i, j, inst)] - inst->cable_powers[inst->n_cables - 1]) > EPSILON_SMALL)
                 {
-                    score += 10e9 * (inst->solution[fpos(i, j, inst)] - inst->cable_powers[inst->n_cables - 1]);
+                    score += 10e9 * (inst->solution[f_pos(i, j, inst)] - inst->cable_powers[inst->n_cables - 1]);
                     ++stream_exceed_cnt;
                 }
                 else
                 {
                     for (k = 0; k < inst->n_cables; ++k)
                     {
-                        if ((inst->cable_powers[k] + EPSILON_SMALL) >= inst->solution[fpos(i, j, inst)])
+                        if ((inst->cable_powers[k] + EPSILON_SMALL) >= inst->solution[f_pos(i, j, inst)])
                         {
                             score += inst->cable_costs[k] * hypot(inst->x_turb_coords[i] - inst->x_turb_coords[j], inst->y_turb_coords[i] - inst->y_turb_coords[j]);
                             break;
@@ -468,13 +461,13 @@ double evaluate_preds(instance *inst, int *preds, double best_score, int log) {
         {
             for (j = 0; j < inst->n_turbines; ++j)
             {
-                if ((inst->solution[ypos(i, j, inst)] + inst->solution[ypos(j, i, inst)]) < EPSILON_SMALL) continue;
+                if ((inst->solution[y_pos(i, j, inst)] + inst->solution[y_pos(j, i, inst)]) < EPSILON_SMALL) continue;
                 for (k = i+1; k < inst->n_turbines; ++k)
                 {
                     for (h = 0; h < inst->n_turbines; ++h)
                     {
                         // true if (i,j) exists and (k,h) exists and (i,j) cross (k,h)
-                        if ((inst->solution[ypos(i, j, inst)] > EPSILON_MED) && (inst->solution[ypos(k, h, inst)] > EPSILON_MED) && get_cross_table(inst, inst->cross_table, i, j, k, h))
+                        if ((inst->solution[y_pos(i, j, inst)] > EPSILON_MED) && (inst->solution[y_pos(k, h, inst)] > EPSILON_MED) && get_cross_table(inst, inst->cross_table, i, j, k, h))
                         {
                             score += 10e9;
                             ++cross_cnt;
@@ -494,13 +487,13 @@ double evaluate_preds(instance *inst, int *preds, double best_score, int log) {
         {
             for (j = 0; j < inst->n_turbines; ++j)
             {
-                if ((inst->solution[ypos(i, j, inst)] + inst->solution[ypos(j, i, inst)]) < EPSILON_SMALL) continue;
+                if ((inst->solution[y_pos(i, j, inst)] + inst->solution[y_pos(j, i, inst)]) < EPSILON_SMALL) continue;
                 for (k = i+1; k < inst->n_turbines; ++k)
                 {
                     for (h = 0; h < inst->n_turbines; ++h)
                     {
                         // true if (i,j) exists and (k,h) exists and (i,j) cross (k,h)
-                        if ((inst->solution[ypos(i, j, inst)] > EPSILON_MED) && (inst->solution[ypos(k, h, inst)] > EPSILON_MED) && is_crossing(inst->x_turb_coords[i], inst->y_turb_coords[i], inst->x_turb_coords[j], inst->y_turb_coords[j], inst->x_turb_coords[k], inst->y_turb_coords[k], inst->x_turb_coords[h], inst->y_turb_coords[h]))
+                        if ((inst->solution[y_pos(i, j, inst)] > EPSILON_MED) && (inst->solution[y_pos(k, h, inst)] > EPSILON_MED) && is_crossing(inst->x_turb_coords[i], inst->y_turb_coords[i], inst->x_turb_coords[j], inst->y_turb_coords[j], inst->x_turb_coords[k], inst->y_turb_coords[k], inst->x_turb_coords[h], inst->y_turb_coords[h]))
                         {
                             score += 10e9;
                             ++cross_cnt;
@@ -520,14 +513,14 @@ double evaluate_preds(instance *inst, int *preds, double best_score, int log) {
     {
         for (j = 0; j < inst->n_turbines; ++j)
         {
-            if ((inst->solution[ypos(i, j, inst)] + inst->solution[ypos(j, i, inst)]) < EPSILON_SMALL) continue;
+            if ((inst->solution[y_pos(i, j, inst)] + inst->solution[y_pos(j, i, inst)]) < EPSILON_SMALL) continue;
 
             for (k = i+1; k < inst->n_turbines; ++k)
             {
                 for (h = 0; h < inst->n_turbines; ++h)
                 {
                     // true if (i,j) exists and (k,h) exists and (i,j) cross (k,h)
-                    if ((inst->solution[ypos(i, j, inst)] > EPSILON_MED) && (inst->solution[ypos(k, h, inst)] > EPSILON_MED) && get_cross_table(inst, inst->cross_table, i, j, k, h))
+                    if ((inst->solution[y_pos(i, j, inst)] > EPSILON_MED) && (inst->solution[y_pos(k, h, inst)] > EPSILON_MED) && get_cross_table(inst, inst->cross_table, i, j, k, h))
                     {
                         score += 10e9;
                         ++cross_cnt;
@@ -583,8 +576,8 @@ double evaluate_preds(instance *inst, int *preds, double best_score, int log) {
     {
         if (i == preds[i]) continue;
 
-        inst->solution[fpos(i, preds[i], inst)] = inst->streams[i] + 1;
-        inst->solution[ypos(i, preds[i], inst)] = 1.0;
+        inst->solution[f_pos(i, preds[i], inst)] = inst->streams[i] + 1;
+        inst->solution[y_pos(i, preds[i], inst)] = 1.0;
 
         for (j = 0; j < inst->n_cables; ++j)
         {
@@ -593,18 +586,18 @@ double evaluate_preds(instance *inst, int *preds, double best_score, int log) {
 
         if (inst->cable_powers[inst->n_cables - 1] < inst->streams[i] + 1)
         {
-            inst->solution[xpos(i, preds[i], inst->n_cables - 1, inst)] = 1.0;
+            inst->solution[x_pos(i, preds[i], inst->n_cables - 1, inst)] = 1.0;
         }
         else
         {
-            inst->solution[xpos(i, preds[i], j, inst)] = 1.0; 
+            inst->solution[x_pos(i, preds[i], j, inst)] = 1.0; 
         }
     }
 
     // evaluate C and total stream
     for (i = 0; i < inst->n_turbines; ++i)
     {
-        if (inst->solution[fpos(i, inst->subs_index, inst)] > EPSILON_MED)
+        if (inst->solution[f_pos(i, inst->subs_index, inst)] > EPSILON_MED)
         {
             ++in_deg_cnt;
         }
@@ -620,18 +613,18 @@ double evaluate_preds(instance *inst, int *preds, double best_score, int log) {
     {
         for (j = 0; j < inst->n_turbines; ++j)
         {
-            if (inst->solution[fpos(i, j, inst)] > EPSILON_SMALL)
+            if (inst->solution[f_pos(i, j, inst)] > EPSILON_SMALL)
             {
-                if ((inst->solution[fpos(i, j, inst)] - inst->cable_powers[inst->n_cables - 1]) > EPSILON_SMALL)
+                if ((inst->solution[f_pos(i, j, inst)] - inst->cable_powers[inst->n_cables - 1]) > EPSILON_SMALL)
                 {
-                    score += 10e9 * (inst->solution[fpos(i, j, inst)] - inst->cable_powers[inst->n_cables - 1]);
+                    score += 10e9 * (inst->solution[f_pos(i, j, inst)] - inst->cable_powers[inst->n_cables - 1]);
                     ++stream_exceed_cnt;
                 }
                 else
                 {
                     for (k = 0; k < inst->n_cables; ++k)
                     {
-                        if ((inst->cable_powers[k] + EPSILON_SMALL) >= inst->solution[fpos(i, j, inst)])
+                        if ((inst->cable_powers[k] + EPSILON_SMALL) >= inst->solution[f_pos(i, j, inst)])
                         {
                             score += inst->cable_costs[k] * hypot(inst->x_turb_coords[i] - inst->x_turb_coords[j], inst->y_turb_coords[i] - inst->y_turb_coords[j]);
                             break;
@@ -652,14 +645,14 @@ double evaluate_preds(instance *inst, int *preds, double best_score, int log) {
     {
         for (j = 0; j < inst->n_turbines; ++j)
         {
-            if ((inst->solution[ypos(i, j, inst)] + inst->solution[ypos(j, i, inst)]) < EPSILON_SMALL) continue;
+            if ((inst->solution[y_pos(i, j, inst)] + inst->solution[y_pos(j, i, inst)]) < EPSILON_SMALL) continue;
 
             for (k = i+1; k < inst->n_turbines; ++k)
             {
                 for (h = 0; h < inst->n_turbines; ++h)
                 {
                     // true if (i,j) exists and (k,h) exists and (i,j) cross (k,h)
-                    if ((inst->solution[ypos(i, j, inst)] > EPSILON_MED) && (inst->solution[ypos(k, h, inst)] > EPSILON_MED) && is_crossing(inst->x_turb_coords[i], inst->y_turb_coords[i], inst->x_turb_coords[j], inst->y_turb_coords[j], inst->x_turb_coords[k], inst->y_turb_coords[k], inst->x_turb_coords[h], inst->y_turb_coords[h]))
+                    if ((inst->solution[y_pos(i, j, inst)] > EPSILON_MED) && (inst->solution[y_pos(k, h, inst)] > EPSILON_MED) && is_crossing(inst->x_turb_coords[i], inst->y_turb_coords[i], inst->x_turb_coords[j], inst->y_turb_coords[j], inst->x_turb_coords[k], inst->y_turb_coords[k], inst->x_turb_coords[h], inst->y_turb_coords[h]))
                     {
                         score += 10e9;
                         ++cross_cnt;
@@ -696,10 +689,10 @@ double evaluate_preds(instance *inst, int *preds, double best_score, int log) {
     // evaluate C and total stream
     for (i = 0; i < inst->n_turbines; ++i)
     {
-        if (solution[fpos(i, inst->subs_index, inst)] > EPSILON_MED)
+        if (solution[f_pos(i, inst->subs_index, inst)] > EPSILON_MED)
         {
             ++in_deg_cnt;
-            tot_stream += solution[fpos(i, inst->subs_index, inst)];
+            tot_stream += solution[f_pos(i, inst->subs_index, inst)];
         }
     }
 
@@ -720,18 +713,18 @@ double evaluate_preds(instance *inst, int *preds, double best_score, int log) {
     {
         for (j = 0; j < inst->n_turbines; ++j)
         {
-            if (inst->solution[fpos(i, j, inst)] > EPSILON_SMALL)
+            if (inst->solution[f_pos(i, j, inst)] > EPSILON_SMALL)
             {
-                if ((inst->solution[fpos(i, j, inst)] - inst->cable_powers[inst->n_cables - 1]) > EPSILON_SMALL)
+                if ((inst->solution[f_pos(i, j, inst)] - inst->cable_powers[inst->n_cables - 1]) > EPSILON_SMALL)
                 {
-                    score += 10e9 * (inst->solution[fpos(i, j, inst)] - inst->cable_powers[inst->n_cables - 1]);
+                    score += 10e9 * (inst->solution[f_pos(i, j, inst)] - inst->cable_powers[inst->n_cables - 1]);
                     ++stream_exceed_cnt;
                 }
                 else
                 {
                     for (k = 0; k < inst->n_cables; ++k)
                     {
-                        if ((inst->cable_powers[k] + EPSILON_SMALL) >= inst->solution[fpos(i, j, inst)])
+                        if ((inst->cable_powers[k] + EPSILON_SMALL) >= inst->solution[f_pos(i, j, inst)])
                         {
                             score += inst->cable_costs[k] * hypot(inst->x_turb_coords[i] - inst->x_turb_coords[j], inst->y_turb_coords[i] - inst->y_turb_coords[j]);
                             break;
@@ -754,13 +747,13 @@ double evaluate_preds(instance *inst, int *preds, double best_score, int log) {
         {
             for (j = 0; j < inst->n_turbines; ++j)
             {
-                if ((inst->solution[ypos(i, j, inst)] + inst->solution[ypos(j, i, inst)]) < EPSILON_SMALL) continue;
+                if ((inst->solution[y_pos(i, j, inst)] + inst->solution[y_pos(j, i, inst)]) < EPSILON_SMALL) continue;
                 for (k = i+1; k < inst->n_turbines; ++k)
                 {
                     for (h = 0; h < inst->n_turbines; ++h)
                     {
                         // true if (i,j) exists and (k,h) exists and (i,j) cross (k,h)
-                        if ((inst->solution[ypos(i, j, inst)] > EPSILON_MED) && (inst->solution[ypos(k, h, inst)] > EPSILON_MED) && get_cross_table(inst, inst->cross_table, i, j, k, h))
+                        if ((inst->solution[y_pos(i, j, inst)] > EPSILON_MED) && (inst->solution[y_pos(k, h, inst)] > EPSILON_MED) && get_cross_table(inst, inst->cross_table, i, j, k, h))
                         {
                             score += 10e9;
                             ++cross_cnt;
@@ -780,13 +773,13 @@ double evaluate_preds(instance *inst, int *preds, double best_score, int log) {
         {
             for (j = 0; j < inst->n_turbines; ++j)
             {
-                if ((inst->solution[ypos(i, j, inst)] + inst->solution[ypos(j, i, inst)]) < EPSILON_SMALL) continue;
+                if ((inst->solution[y_pos(i, j, inst)] + inst->solution[y_pos(j, i, inst)]) < EPSILON_SMALL) continue;
                 for (k = i+1; k < inst->n_turbines; ++k)
                 {
                     for (h = 0; h < inst->n_turbines; ++h)
                     {
                         // true if (i,j) exists and (k,h) exists and (i,j) cross (k,h)
-                        if ((inst->solution[ypos(i, j, inst)] > EPSILON_MED) && (inst->solution[ypos(k, h, inst)] > EPSILON_MED) && is_crossing(inst->x_turb_coords[i], inst->y_turb_coords[i], inst->x_turb_coords[j], inst->y_turb_coords[j], inst->x_turb_coords[k], inst->y_turb_coords[k], inst->x_turb_coords[h], inst->y_turb_coords[h]))
+                        if ((inst->solution[y_pos(i, j, inst)] > EPSILON_MED) && (inst->solution[y_pos(k, h, inst)] > EPSILON_MED) && is_crossing(inst->x_turb_coords[i], inst->y_turb_coords[i], inst->x_turb_coords[j], inst->y_turb_coords[j], inst->x_turb_coords[k], inst->y_turb_coords[k], inst->x_turb_coords[h], inst->y_turb_coords[h]))
                         {
                             score += 10e9;
                             ++cross_cnt;
@@ -836,9 +829,7 @@ int heur_VNS_launcher(instance *inst) {
 
     inst->cross_table = generate_cross_table(inst);
 
-    do
-    {
-        //printf("%s Launching test %d\n", get_log(), test_cnt);
+    do {
         srand(test_cnt + inst->randomseed);
         revisited_dijkstra(inst, preds);
         
@@ -849,17 +840,17 @@ int heur_VNS_launcher(instance *inst) {
             for (j = 0; j < inst->n_turbines; ++j) best_preds[j] = preds[j]; 
 
             best_score = score;
-            printf("%s time_elapsed=%lf Solution found with score=%.4e\n", get_log(), get_time_elapsed(inst), score);
+            printf("time_elapsed=%lf Solution found with score=%.4e\n", get_time_elapsed(inst), score);
         }
 
         test_cnt++;
     } while (!is_time_limit_expired(inst));
 
     score = evaluate_preds(inst, best_preds, DBL_MAX, 1);
-    printf("\n%s Best obj-val=%lf\n", get_log(), score);
-    printf("%s Best integer=%lf\n", get_log(), score);
+    printf("\nBest obj-val=%lf\n", score);
+    printf("Best integer=%lf\n", score);
 
-    printf("%s time_elapsed=%lf final_score=%.4e\n", get_log(), get_time_elapsed(inst), score);
+    printf("time_elapsed=%lf final_score=%.4e\n", get_time_elapsed(inst), score);
 
     preds_to_solution(inst, best_preds, inst->xstar);
     
@@ -901,7 +892,7 @@ int heur_simulated_annealing_launcher(instance *inst) {
 
     do
     {
-        printf("%s Launching test %d\n", get_log(), test_cnt);
+        printf("Launching test %d\n", test_cnt);
         srand(test_cnt + inst->randomseed);
         //dijkstra(inst, preds);
         revisited_dijkstra(inst, preds);
@@ -909,23 +900,21 @@ int heur_simulated_annealing_launcher(instance *inst) {
         score = simulated_annealing(inst, preds, best_score);
         //printf("SCORE=%lf, BEST_SCORE=%lf\n", score, best_score);
         
-        if (score < best_score)
-        {
+        if (score < best_score) {
             //printf("ACCETTO\n");
             for (j = 0; j < inst->n_turbines; ++j) best_preds[j] = preds[j];
             best_score = score;
-            //printf("%s time_elapsed=%lf Solution found with score=%.4e\n", get_log(), get_time_elapsed(inst), score);
         }
-        printf("%s time_elapsed=%lf Solution found with score=%.4e\n", get_log(), get_time_elapsed(inst), score);
+        printf("time_elapsed=%lf Solution found with score=%.4e\n", get_time_elapsed(inst), score);
         
         test_cnt++;
     } while (!is_time_limit_expired(inst));
 
     //score = evaluate_preds(inst, best_preds, DBL_MAX, 1);
-    printf("\n%s Best obj-val=%lf\n", get_log(), best_score);
-    printf("%s Best integer=%lf\n", get_log(), best_score);
+    printf("\nBest obj-val=%lf\n", best_score);
+    printf("Best integer=%lf\n", best_score);
 
-    printf("%s time_elapsed=%lf final_score=%.4e\n", get_log(), get_time_elapsed(inst), best_score);
+    printf("time_elapsed=%lf final_score=%.4e\n", get_time_elapsed(inst), best_score);
 
     preds_to_solution(inst, best_preds, inst->xstar);
 
@@ -1066,8 +1055,7 @@ double simulated_annealing(instance *inst, int *preds, double c) {
   
         T *= alpha; // Decreases T, cooling phase 
 
-        //printf("%s     Solution found with min_cost = %.4e\n", get_log(), min_cost);
-        printf("%s time_elapsed=%4.4lf Solution found with cost=%.4e\n", get_log(), get_time_elapsed(inst), min_cost);
+        printf("time_elapsed=%4.4lf Solution found with cost=%.4e\n", get_time_elapsed(inst), min_cost);
         
         if (inst->time_limit_expired) break;
     }

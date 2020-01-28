@@ -1,13 +1,19 @@
+
 #ifndef WF_H_
 #define WF_H_
 
-#include <stdio.h>
-#include <math.h>
-#include <stdlib.h>
-#include <string.h>
+#include <boost/program_options.hpp>
 #include <cplex.h>
+#include <iostream>
+#include <math.h>
 #include <pthread.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
 #include <time.h>
+
+using namespace std;
+namespace po = boost::program_options;
 
 #define VERBOSE				  	50		// printing level  (=10 only incumbent, =20 little output, =50-60 good, =70 verbose, >=100 cplex log)
 
@@ -22,11 +28,11 @@
 #define CALLBACK_MODEL_TYPE     3
 #define LOOP_TASK_MODEL_TYPE    2
 
-#define DBL_MAX 10e20 /* max value */
+//#define DBL_MAX 10e20 /* max value */
 
 // data structures
-typedef struct {
-
+typedef struct
+{
     // input data
     int n_turbines;
     int n_cables;
@@ -42,25 +48,23 @@ typedef struct {
     double *cable_costs;
 
     // parameters
-    int print_model;
-    int rins;
+    bool print_model;
+    bool rins;
     double polishafter;
-    char solver[1000];
+    string solver;
     int model_type;
-    int slack_substation;					// add slack variable to in-deg substation constraint (in order to find quicly an incumbent solution)
-    int slack_flow;                         // add slack variables to flow constraints
+    bool slack_substation;          // add slack variable to in-deg substation constraint (in order to find quicly an incumbent solution)
+    bool slack_flow;                // add slack variables to flow constraints
     int randomseed;
     int num_threads;
-    double time_limit;						// overall time limit, in sec.s
+    double time_limit;              // overall time limit, in sec.s
     double elapsed_time;
-    char turbine_input_file[1000];	  		// turbine input file (name)
-    char cable_input_file[1000];			// cable input file (name)
-    char node_file[1000];		  			// cplex node file
-    char params_file[1000];
-    double iter_time;                       // iteration time
-    double hard_fix_prob;                   // hard fix probability
-    int use_cross_table;
-    int multi;                              // use multi-threads if possible
+    string turbine_input_file;      // turbine input file (name)
+    string cable_input_file;        // cable input file (name)
+    double iter_time;               // iteration time
+    double hard_fix_prob;           // hard fix probability
+    bool use_cross_table;
+    bool multi;                     // use multi-threads if possible
     int ncores;
 
     // global data
@@ -109,9 +113,9 @@ inline int imin(int i1, int i2) { return i1 < i2 ? i1 : i2; }
 inline double dmax(double d1, double d2) { return d1 > d2 ? d1 : d2; }
 inline double dmin(double d1, double d2) { return d1 < d2 ? d1 : d2; }
 
-inline int fpos(int i, int j, instance *inst) { return inst->fstart + i * inst->n_turbines + j; }
-inline int xpos(int i, int j, int k, instance *inst) { return inst->xstart + i * inst->n_turbines * inst->n_cables + j * inst->n_cables + k; }
-inline int ypos(int i, int j, instance *inst) { return inst->ystart + i * inst->n_turbines + j; }
+inline int f_pos(int i, int j, instance *inst) { return inst->fstart + i * inst->n_turbines + j; }
+inline int x_pos(int i, int j, int k, instance *inst) { return inst->xstart + i * inst->n_turbines * inst->n_cables + j * inst->n_cables + k; }
+inline int y_pos(int i, int j, instance *inst) { return inst->ystart + i * inst->n_turbines + j; }
 
 int WFopt(instance *inst);
 void build_model(instance *inst, CPXENVptr env, CPXLPptr lp);
@@ -121,7 +125,6 @@ void callback_solver(instance *inst, CPXENVptr env, CPXLPptr lp);
 void hardfix_solver(instance *inst, CPXENVptr env, CPXLPptr lp);
 
 void print_error(const char *err);
-char *get_log();
 int is_time_limit_expired(instance *inst);
 double get_time_elapsed(instance *inst);
 int mip_solved_to_optimality(CPXENVptr env, CPXLPptr lp);
