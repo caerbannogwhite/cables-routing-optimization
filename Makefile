@@ -10,27 +10,38 @@ CFLAGS=-g -Wall -O2
 LDLIBS=-L$(CPLEX_HOME)/lib/x86-64_linux/static_pic -lcplex -L$(BOOST_HOME)/stage/lib -lboost_program_options -lm -lpthread -ldl
 INC=-I$(CPLEX_HOME)/include/ilcplex -I$(BOOST_HOME)
 
-$(P) : aux.o heur.o main.o wf.o
-	$(CC) $(CFLAGS) bin/aux.o bin/heur.o bin/main.o bin/wf.o -o $@ $(LDLIBS) $(INC)
+$(P) : $(P)_cpx $(P)_heur
+	# fake rule
+
+$(P)_cpx : common.o main_cpx.o wf_cpx.o
+	$(CC) $(CFLAGS) bin/common.o bin/main_cpx.o bin/wf_cpx.o -o $@ $(LDLIBS) $(INC)
 	mv $@ bin
 
-aux.o : src/aux.cpp src/aux.h src/wf.h
+$(P)_heur : common.o main_heur.o wf_heur.o
+	$(CC) $(CFLAGS) bin/common.o bin/main_heur.o bin/wf_heur.o -o $@ $(LDLIBS) $(INC)
+	mv $@ bin
+
+common.o : src/common.cpp src/common.hpp
 	$(CC) $(CFLAGS) -c src/$*.cpp $(LDLIBS) $(INC)
 	mv $@ bin
 
-heur.o : src/heur.cpp src/heur.h src/aux.h
+main_cpx.o : src/main_cpx.cpp src/wf_cpx.hpp
 	$(CC) $(CFLAGS) -c src/$*.cpp $(LDLIBS) $(INC)
 	mv $@ bin
 
-main.o : src/main.cpp src/wf.h
+main_heur.o : src/main_heur.cpp src/wf_heur.hpp
 	$(CC) $(CFLAGS) -c src/$*.cpp $(LDLIBS) $(INC)
 	mv $@ bin
 
-wf.o : src/wf.cpp src/wf.h
+wf_cpx.o : src/wf_cpx.cpp src/wf_cpx.hpp src/common.hpp
+	$(CC) $(CFLAGS) -c src/$*.cpp $(LDLIBS) $(INC)
+	mv $@ bin
+
+wf_heur.o : src/wf_heur.cpp src/wf_heur.hpp src/common.hpp
 	$(CC) $(CFLAGS) -c src/$*.cpp $(LDLIBS) $(INC)
 	mv $@ bin
 
 clean:
-	rm -f bin/$(P) bin/*.o
+	rm -f bin/$(P)_cpx bin/$(P)_heur bin/*.o
 
 .PHONY: clean
