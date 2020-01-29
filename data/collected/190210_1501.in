@@ -1,8 +1,0 @@
-turbine_file:data/data_07.turb
-cable_file:data/data_07.cbl
-subs_cables:10
-solver:VNS
-time_limit:600
-use_cross_table:
-
-8) solver=VNS, time=600.000670, seed=0, best_integer=8877817.717083, best_obj_val=8877817.717083, gap=0.000000

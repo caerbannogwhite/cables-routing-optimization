@@ -1,9 +1,0 @@
-turbine_file:data/data_07.turb
-cable_file:data/data_07.cbl
-subs_cables:10
-solver:simulated_annealing
-time_limit:3600
-use_cross_table:
-
-1) solver=simulated_annealing, time=3600.001216, seed=0, best_integer=1220046101282.156738, best_obj_val=1220046101282.156738, gap=0.000000
-2) solver=simulated_annealing, time=3600.001805, seed=0, best_integer=1220048448527.112549, best_obj_val=1220048448527.112549, gap=0.000000
