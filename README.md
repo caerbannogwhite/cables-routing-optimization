@@ -1,16 +1,16 @@
 # Wind Farm Cables Routing Optimization
 
-We developed this project for the Operations Research 2 course.
+We developed this project for the *Operational Research 2* course.
 
 The software consists of a solver for finding a minimum cost interconnection between all the turbines of a given wind farm, respecting the specific design constraints.
 
-The software implements several approaches that work with the Mixed Integer Linear Programming (MILP) solver CPLEX.
-
+This project implements several approaches that work with the **Mixed-Integer Linear Programming** (MILP) solver CPLEX.
 Alternatively, we implement two heuristic solvers that can run independently from the CPLEX library.
 
 The original article we utilised to set up this project can be found [here](https://orbit.dtu.dk/en/publications/optimizing-wind-farm-cable-routing-considering-power-losses-2).
+The results obtained are described in this [report](https://github.com/caerbannogwhite/WindFarmCablesRoutingOptimization/blob/master/report/report.pdf).
 
-The software requires [CPLEX](https://www.ibm.com/analytics/cplex-optimizer) and the [Boost](https://www.boost.org/) library. Once you have installed them in your computer, you can change the `CPLEX_HOME` and the `BOOST_HOME` variables in `Makefile`.
+The software requires [CPLEX](https://www.ibm.com/analytics/cplex-optimizer) and the [Boost](https://www.boost.org/) library. Once you have installed them in your computer, you should change the `CPLEX_HOME` and the `BOOST_HOME` variables in `Makefile`.
 If `Makefile` is not able to locate `CPLEX_HOME` correctly, then it will produce only one executable file (`wfsolver_heur`). Otherwise, it will also produce the `wfsolver_cpx` executable.
 
 Here are some images of the connections computed by our solver.
