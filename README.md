@@ -1,7 +1,5 @@
 # Wind Farm Cables Routing Optimization
 
-We developed this project for the *Operational Research 2* course.
-
 The software consists of a solver for finding a minimum cost interconnection between all the turbines of a given wind farm, respecting the specific design constraints.
 
 This project implements several approaches that work with the **Mixed-Integer Linear Programming** (MILP) solver CPLEX.
